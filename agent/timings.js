@@ -16,7 +16,6 @@ var HarvestScheduler = require('./harvest-scheduler')
 var register = require('./register-handler')
 var subscribeToUnload = require('./unload')
 var cleanURL = require('./clean-url')
-var handle = require('handle')
 
 var timings = []
 var timingsSent = []
@@ -28,7 +27,6 @@ var clsSession = {value: 0, firstEntryTime: 0, lastEntryTime: 0}
 var pageHideRecorded = false
 
 module.exports = {
-  addTiming: addTiming,
   getPayload: getPayload,
   timings: timings,
   init: init,
@@ -159,8 +157,6 @@ function addTiming(name, value, attrs, addCls) {
     value: value,
     attrs: attrs
   })
-
-  handle('pvtAdded', [name, value, attrs])
 }
 
 function processTiming(name, value, attrs) {
