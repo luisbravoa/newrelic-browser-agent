@@ -184,6 +184,9 @@ function send (endpoint, nr, singlePayload, opts, submitMethod, cbFinished) {
   if (singlePayload.qs) mapOwn(singlePayload.qs, makeQueryString)
 
   var payload = { body: makeBody(), qs: makeQueryString() }
+  if (singlePayload.appId) {
+    payload.appId = singlePayload.appId
+  }
   return _send(endpoint, nr, payload, opts, submitMethod, cbFinished)
 }
 
@@ -199,7 +202,7 @@ function _send (endpoint, nr, payload, opts, submitMethod, cbFinished) {
 
   if (!opts) opts = {}
 
-  var url = scheme + '://' + nr.info.errorBeacon + '/' + endpoint + '/1/' + nr.info.licenseKey + baseQueryString(nr)
+  var url = scheme + '://' + nr.info.errorBeacon + '/' + endpoint + '/1/' + nr.info.licenseKey + baseQueryString(nr, payload.appId)
   if (payload.qs) url += encode.obj(payload.qs, nr.maxBytes)
 
   if (!submitMethod) {
@@ -302,14 +305,14 @@ function resetListeners() {
 }
 
 // The stuff that gets sent every time.
-function baseQueryString (nr) {
+function baseQueryString (nr, appId) {
   var areCookiesEnabled = true
   if ('init' in NREUM && 'privacy' in NREUM.init) {
     areCookiesEnabled = NREUM.init.privacy.cookies_enabled
   }
 
   return ([
-    '?a=' + nr.info.applicationID,
+    '?a=' + appId || nr.info.applicationID,
     encode.param('sa', (nr.info.sa ? '' + nr.info.sa : '')),
     encode.param('v', version),
     transactionNameParam(nr),

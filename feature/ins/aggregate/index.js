@@ -19,7 +19,12 @@ var eventsPerHarvest = eventsPerMinute * harvestTimeSeconds / 60
 var referrerUrl
 var currentEvents
 
-var events = []
+var eventsByAppId = {}
+eventsByAppId[loader.info.applicationID] = []
+
+// used for temporary caching in case retry is needed
+var currentEventsByAppId
+
 var att = loader.info.jsAttributes = {}
 
 if (document.referrer) referrerUrl = cleanURL(document.referrer)
@@ -28,32 +33,40 @@ register('api-setCustomAttribute', setCustomAttribute, 'api')
 
 ee.on('feat-ins', function () {
   register('api-addPageAction', addPageAction)
-
-  harvest.on('ins', onHarvestStarted)
-  var scheduler = new HarvestScheduler(loader, 'ins', { onFinished: onHarvestFinished })
+  
+  var scheduler = new HarvestScheduler(loader, 'ins', { 
+    onFinished: onHarvestFinished,
+    getPayload: onHarvestStarted
+  })
   scheduler.startTimer(harvestTimeSeconds, 0)
 })
 
 function onHarvestStarted (options) {
-  var payload = ({
-    qs: {
-      ua: loader.info.userAttributes,
-      at: loader.info.atts
-    },
-    body: {
-      ins: events
-    }
-  })
+  var payload = []
 
-  if (options.retry) {
-    currentEvents = events
+  for (var appId in eventsByAppId) {
+    payload.push({
+      appId: appId,
+      qs: {
+        ua: loader.info.userAttributes,
+        at: loader.info.atts
+      },
+      body: {
+        ins: eventsByAppId[appId]
+      }
+    })
   }
 
-  events = []
+  if (options.retry) {
+    currentEventsByAppId = eventsByAppId
+  }
+
+  eventsByAppId = {}
   return payload
 }
 
 function onHarvestFinished (result) {
+  // TODO: handler retry per appId
   if (result && result.sent && result.retry && currentEvents) {
     events = events.concat(currentEvents)
     currentEvents = null
@@ -61,8 +74,10 @@ function onHarvestFinished (result) {
 }
 
 // WARNING: Insights times are in seconds. EXCEPT timestamp, which is in ms.
-function addPageAction (t, name, attributes) {
-  if (events.length >= eventsPerHarvest) return
+function addPageAction (t, name, attributes, options) {
+  // TODO: handle limit
+  // if (events.length >= eventsPerHarvest) return
+
   var width
   var height
   var eventAttributes = {}
@@ -92,7 +107,11 @@ function addPageAction (t, name, attributes) {
   }
   eventAttributes.actionName = name || ''
 
-  events.push(eventAttributes)
+  var appId = (options && options.appId) || loader.info.applicationID
+  if (!eventsByAppId[appId]) {
+    eventsByAppId[appId] = []
+  }
+  eventsByAppId[appId].push(eventAttributes)
 
   function set (key, val) {
     eventAttributes[key] = (val && typeof val === 'object' ? stringify(val) : val)
