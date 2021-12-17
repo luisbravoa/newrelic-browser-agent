@@ -21,7 +21,9 @@ var shouldCollectEvent = require('./deny-list').shouldCollectEvent
 var subscribeToUnload = require('../../../agent/unload')
 var recordSupportability = require('metrics').recordSupportability
 
-var ajaxEvents = []
+var ajaxEventsByAppId = {}
+ajaxEventsByAppId[loader.info.applicationID] = []
+
 var spaAjaxEvents = {}
 var sentAjaxEvents = []
 var scheduler
@@ -42,7 +44,10 @@ baseEE.on('feat-err', function() {
   })
 
   if (allAjaxIsEnabled()) {
-    scheduler = new HarvestScheduler(loader, 'events', { onFinished: onEventsHarvestFinished, getPayload: prepareHarvest })
+    scheduler = new HarvestScheduler(loader, 'events', {
+      onFinished: onEventsHarvestFinished,
+      getPayload: prepareHarvest
+    })
     scheduler.startTimer(harvestTimeSeconds)
 
     subscribeToUnload(finalHarvest)
@@ -57,12 +62,12 @@ module.exports.setDenyList = setDenyList
 
 function getStoredEvents() {
   return {
-    ajaxEvents: ajaxEvents,
+    ajaxEvents: ajaxEventsByAppId,
     spaAjaxEvents: spaAjaxEvents
   }
 }
 
-function storeXhr(params, metrics, startTime, endTime, type) {
+function storeXhr(params, metrics, startTime, endTime, type, options) {
   metrics.time = startTime
 
   // send to session traces
@@ -118,7 +123,11 @@ function storeXhr(params, metrics, startTime, endTime, type) {
     spaAjaxEvents[interactionId] = spaAjaxEvents[interactionId] || []
     spaAjaxEvents[interactionId].push(event)
   } else {
-    ajaxEvents.push(event)
+    var appId = (options && options.appId) || loader.info.applicationID
+    if (!ajaxEventsByAppId[appId]) {
+      ajaxEventsByAppId[appId] = []
+    }
+    ajaxEventsByAppId[appId].push(event)
   }
 }
 
@@ -133,7 +142,9 @@ baseEE.on('interactionDiscarded', function (interaction) {
 
   spaAjaxEvents[interaction.id].forEach(function (item) {
     // move it from the spaAjaxEvents buffer to the ajaxEvents buffer for harvesting here
-    ajaxEvents.push(item)
+
+    // TODO: 
+    // ajaxEvents.push(item)
   })
   delete spaAjaxEvents[interaction.id]
 })
@@ -141,22 +152,25 @@ baseEE.on('interactionDiscarded', function (interaction) {
 function prepareHarvest(options) {
   options = options || {}
 
-  if (ajaxEvents.length === 0) {
-    return null
-  }
-
-  var payload = getPayload(ajaxEvents, options.maxPayloadSize || MAX_PAYLOAD_SIZE)
-
   var payloadObjs = []
-  for (var i = 0; i < payload.length; i++) {
-    payloadObjs.push({body: {e: payload[i]}})
+  for (var appId in ajaxEventsByAppId) {
+    var ajaxEvents = ajaxEventsByAppId[appId]
+
+    var payload = getPayload(ajaxEvents, options.maxPayloadSize || MAX_PAYLOAD_SIZE)
+
+    for (var i = 0; i < payload.length; i++) {
+      payloadObjs.push({
+        appId: appId,
+        body: {e: payload[i]}
+      })
+    }
   }
 
   if (options.retry) {
     sentAjaxEvents = ajaxEvents.slice()
   }
 
-  ajaxEvents = []
+  ajaxEventsByAppId = {}
 
   return payloadObjs
 }

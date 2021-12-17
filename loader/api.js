@@ -82,3 +82,9 @@ newrelic.noticeError = function (err, customAttributes) {
   metrics.recordSupportability('API/noticeError/called')
   handle('err', [err, loader.now(), false, customAttributes])
 }
+
+newrelic.noticeAjax = function(params, metrics, startTime, endTime, type, options) {
+  // context is used only for DT, we are not implementing for the POC
+  var context = {}
+  handle('xhr', [params, metrics, startTime, endTime, type, options], context)
+}
