@@ -57,15 +57,17 @@ HarvestScheduler.prototype.runHarvest = function runHarvest(opts) {
 
     var retry = submitMethod.method === submitData.xhr
     var payload = this.opts.getPayload({ retry: retry })
+    console.log('this.endpoint', this.endpoint, 'payload', payload)
     if (payload) {
       payload = Object.prototype.toString.call(payload) === '[object Array]' ? payload : [payload]
       for (var i = 0; i < payload.length; i++) {
         // log('send')
+        console.log('send', payload)
         send(this.endpoint, payload[i], opts, submitMethod, onHarvestFinished)
       }
     }
   } else {
-    // log('sendX')
+    log('sendX')
     sendX(this.endpoint, opts, onHarvestFinished)
   }
 

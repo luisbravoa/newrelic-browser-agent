@@ -15,6 +15,7 @@ let _enabledFeatures:  NrFeatures[] = [
 // let _disabledFeatures: NrFeatures[] = []
 
 const nr = {
+  // TODO: remove disable call, replace with list of features to disable in init config
   disable: (features: NrFeatures[] | NrFeatures) => {
     if (initialized) return console.error("Features must be disabled before starting the NR Agent")
     if (Array.isArray(features))_enabledFeatures = _enabledFeatures.filter(f => !features.includes(f))
@@ -23,6 +24,7 @@ const nr = {
   get features(): NrFeatures[] {
     return _enabledFeatures
   },
+  // TODO: choose between start exported here or initialize exported elsewhere
   start: initialize,
   storeError
 }
@@ -31,7 +33,7 @@ const nr = {
 export default nr
 
 export { initialize as init }
-
+// TODO: update initialize 
 async function initialize({ info, config, loader_config }: { info: NrInfo, config?: NrConfig, loader_config?: NrLoaderConfig }) {
   if (initialized) return
   setInfo(info)

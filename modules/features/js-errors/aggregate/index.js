@@ -26,6 +26,7 @@ var stackReported = {}
 var pageviewReported = {}
 var errorCache = {}
 var currentBody
+var harvestIds = {}
 
 // Make sure loader.offset is as accurate as possible
 // require('../../../agent/start-time')
@@ -44,6 +45,9 @@ export function initialize(captureGlobal) {
   register('err', storeError)
   register('ierr', storeError)
 
+  // we may be able to remove this
+  // implemented to allow packaged agent to also capture global errors from bespoke ee
+  // register('err') will serve this purpose for modularized agent
   if (captureGlobal) {
     global('err', storeError)
     global('ierr', storeError)
@@ -51,31 +55,77 @@ export function initialize(captureGlobal) {
 
   var harvestTimeSeconds = getConfigurationValue('jserrors.harvestTimeSeconds') || 10
 
-  on('jserrors', onHarvestStarted)
-  var scheduler = new HarvestScheduler('jserrors', { onFinished: onHarvestFinished })
+  // TODO: update sendX to support multiple payloads
+  // on('jserrors', onHarvestStarted)
+  // var scheduler = new HarvestScheduler('jserrors', { onFinished: onHarvestFinished })
+  var scheduler = new HarvestScheduler('jserrors', {
+     onFinished: onHarvestFinished,
+     getPayload: onHarvestStarted
+  })
   scheduler.startTimer(harvestTimeSeconds)
+}
+
+function getPayloadBodies () {
+  var bodies = []
+
+  var types
+  for (var harvestId in harvestIds) {
+    var body = {
+      harvestId: harvestId,
+      body: agg.take([ 'err-' + harvestId ])
+    }
+    bodies.push(body)
+  }
+
+  console.log('getPayloadBodies', bodies)
+  return bodies
 }
 
 function onHarvestStarted(options) {
   log('onHarvestStarted!')
-  var body = agg.take([ 'err', 'ierr' ])
+  // var body = agg.take([ 'err', 'ierr' ])
+  var payload = []
+  
+  var globalBody = agg.take([ 'err', 'ierr' ])
 
-  if (options.retry) {
-    currentBody = body
-  }
+  payload.push(generatePayloadEntry(globalBody))
 
-  var payload = { body: body, qs: {} }
-  var releaseIds = stringify(getRuntime().releaseIds)
+  var payloadBodies = getPayloadBodies()
 
-  if (releaseIds !== '{}') {
-    payload.qs.ri = releaseIds
-  }
+  // TODO: retry logic for all payloads
+  // if (options.retry) {
+  //   currentBody = body
+  // }
 
-  if (body && body.err && body.err.length && !errorOnPage) {
-    payload.qs.pve = '1'
-    errorOnPage = true
-  }
+  payloadBodies.forEach(function (body) {
+    var e = {
+      'err': body.body[ 'err-' + body.harvestId ] 
+    }
+
+    payload.push(generatePayloadEntry(e, body.harvestId))
+  })
+
+  console.log('final payload', payload)
+
+  harvestIds = {}
+
   return payload
+
+  function generatePayloadEntry (body, appId) {
+    var payload = { body: body, qs: {} }
+    if (appId) payload.appId = appId
+    var releaseIds = stringify(getRuntime().releaseIds)
+
+    if (releaseIds !== '{}') {
+      payload.qs.ri = releaseIds
+    }
+
+    if (body && body.err && body.err.length && !errorOnPage) {
+      payload.qs.pve = '1'
+      errorOnPage = true
+    }
+    return payload
+  }
 }
 
 function onHarvestFinished(result) {
@@ -151,7 +201,8 @@ function canonicalizeStackURLs (stackInfo) {
   return stackInfo
 }
 
-export function storeError (err, time, internal, customAttributes) {
+// TODO: support for multiple licenseKeys, replace appId & licenseKey with options object
+export function storeError (err, time, internal, customAttributes, appId, licenseKey) {
   // are we in an interaction
   time = time || now()
   if (!internal && getRuntime().onerror && getRuntime().onerror(err)) return
@@ -210,7 +261,18 @@ export function storeError (err, time, internal, customAttributes) {
 
     var jsAttributesHash = stringHashCode(stringify(customParams))
     var aggregateHash = hash + ':' + jsAttributesHash
-    agg.store(type, aggregateHash, params, newMetrics, customParams)
+
+    // TODO: same method on errors held for SPA
+    if (!appId) {
+      agg.store(type, aggregateHash, params, newMetrics, customParams)
+    } else {
+      var harvestId = type + '-' + appId
+      harvestIds[appId] = true
+
+      agg.store(harvestId, aggregateHash, params, newMetrics, customParams)
+    }
+
+    
   }
 
   function setCustom (key, val) {

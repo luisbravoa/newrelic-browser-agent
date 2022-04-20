@@ -30,8 +30,9 @@ export async function initialize(features: NrFeatures[]){
   
 }
 
-export function storeError(err: Error | String, time?: Number, internal?: any, customAttributes?: any): void {
-    if (initialized && !!api.storeError) return api.storeError(err, time, internal, customAttributes)
+export function storeError(err: Error | String, time?: Number, internal?: any, customAttributes?: any, appId?: any): void {
+    //  TODO: put public API in front of api.storeError. storeError is currently exposed directly but does not err parsing, instancing or supportability metric generating
+    if (initialized && !!api.storeError) return api.storeError(err, time, internal, customAttributes, appId)
     // if the agent has not been started, the source API method will have not been loaded...
     if (!initialized && !api.storeError) return notInitialized(NrFeatures.JSERRORS)
     // if the error feature module is disabled, this function throws a warning message

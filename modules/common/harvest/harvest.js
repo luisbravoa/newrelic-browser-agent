@@ -81,8 +81,11 @@ export function sendX(endpoint, opts, cbFinished) {
   var options = {
     retry: submitMethod.method === submitData.xhr
   }
+
+  var payload = createPayload(endpoint, options)
+  console.log('payload', payload)
   // log('_send!', endpoint, opts, options)
-  return _send(endpoint, createPayload(endpoint, options), opts, submitMethod, cbFinished)
+  return _send(endpoint, payload, opts, submitMethod, cbFinished)
 }
 
 /**
@@ -107,10 +110,16 @@ export function send(endpoint, singlePayload, opts, submitMethod, cbFinished) {
   if (singlePayload.qs) mapOwn(singlePayload.qs, makeQueryString)
 
   var payload = { body: makeBody(), qs: makeQueryString() }
+  console.log('singlePayload', singlePayload)
+  if (singlePayload.appId) {
+    payload.appId = singlePayload.appId
+  }
+
   return _send(endpoint, payload, opts, submitMethod, cbFinished)
 }
 
 function _send(endpoint, payload, opts, submitMethod, cbFinished) {
+  console.log('send', arguments)
   var info = getInfo()
   // log('info in send!', info)
   if (!info.errorBeacon) return false
@@ -126,7 +135,7 @@ function _send(endpoint, payload, opts, submitMethod, cbFinished) {
   if (!opts) opts = {}
 
   // log("_send... getScheme!", getScheme())
-  var url = getScheme() + '://' + info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + baseQueryString()
+  var url = getScheme() + '://' + info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + baseQueryString(payload.appId)
   if (payload.qs) url += encodeObj(payload.qs, getRuntime().maxBytes)
 
   if (!submitMethod) {
@@ -231,7 +240,7 @@ export function resetListeners() {
 }
 
 // The stuff that gets sent every time.
-export function baseQueryString() {
+export function baseQueryString(appId) {
   var areCookiesEnabled = true
   const init = getConfiguration()
   if ('privacy' in init) {
@@ -241,7 +250,7 @@ export function baseQueryString() {
   var info = getInfo()
 
   return ([
-    '?a=' + info.applicationID,
+    '?a=' + appId || info.applicationID,
     encodeParam('sa', (info.sa ? '' + info.sa : '')),
     encodeParam('v', version),
     transactionNameParam(info),

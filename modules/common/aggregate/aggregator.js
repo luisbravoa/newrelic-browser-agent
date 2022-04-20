@@ -36,6 +36,7 @@ function storeEventMetrics (type, name, params, newMetrics, customParams) {
   log("storeEventMetrics", type, name)
   var bucket = getBucket(type, name, params, customParams)
   bucket.metrics = aggregateMetrics(newMetrics, bucket.metrics)
+  console.log('aggregatedData', aggregatedData)
   return bucket
 }
 
