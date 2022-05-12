@@ -31,6 +31,13 @@ export function buildConfigs(options: NrOptions): { info: NrInfo, config: NrConf
       allowed_origins: undefined
     },
     page_view_timing: { enabled: undefined },
+    jserrors: {
+      enabled: undefined,
+      harvestTimeSeconds: undefined
+    },
+    harvest: {
+      tooManyRequestsDelay: undefined,
+    },
     ssl: undefined,
     obfuscate: undefined
   }

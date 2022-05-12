@@ -14,10 +14,20 @@ export class NrFeature {
     get enabled (): boolean {
         return this._enabled
     }
-
-    set enabled(val: boolean) {
-        this._enabled = Boolean(val)
+    obfuscate?: {regex: string | RegExp, replacement: string}[]
+    page_view_timing?: { enabled: boolean };
+    ssl?: boolean;
+    jserrors?: {
+        enabled?: boolean
+        harvestTimeSeconds?: number
     }
+    harvest?: {
+        tooManyRequestsDelay?: boolean
+    }
+    accountID?: string
+    trustKey?: string
+    agentID?: string
+    xpid?: string
 
     get auto(): boolean {
         return this._auto
@@ -67,9 +77,16 @@ export interface NrConfig {
         cors_use_tracecontext_headers?: boolean
         allowed_origins?: string[]
     }
-    page_view_timing?: { enabled?: boolean };
-    ssl?: boolean;
-    obfuscate?: {regex?: string | RegExp, replacement?: string}[]
+    page_view_timing: {enabled?: boolean},
+    jserrors?: {
+        enabled?: boolean,
+        harvestTimeSeconds?: number
+    }
+    harvest?: {
+        tooManyRequestsDelay?: boolean,
+    }
+    ssl?: boolean,
+    obfuscate?: {regex: string | RegExp, replacement: string}[]
 }
 
 export interface NrLoaderConfig extends NrShared {
