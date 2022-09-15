@@ -15,8 +15,8 @@ import { FeatureBase } from '../../../common/util/feature-base'
 var NR_ERR_PROP = 'nr@seenError'
 
 export class Instrument extends FeatureBase {
-  constructor(agentIdentifier) {
-    super(agentIdentifier)
+  constructor(agentIdentifier, aggregator) {
+    super(agentIdentifier, aggregator, 'jserrors')
     // skipNext counter to keep track of uncaught
     // errors that will be the same as caught errors.
     this.skipNext = 0
@@ -87,8 +87,11 @@ export class Instrument extends FeatureBase {
         state.handleErrors = true
       }
     }
+
+    this.importAggregator()
   }
 
+  
   // FF and Android browsers do not provide error info to the 'error' event callback,
   // so we must use window.onerror
   onerrorHandler(message, filename, lineno, column, errorObj) {

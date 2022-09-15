@@ -18,7 +18,7 @@ import { FeatureBase } from '../../../common/util/feature-base'
 
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator) {
-    super(agentIdentifier, aggregator)
+    super(agentIdentifier, aggregator, 'session-trace')
 
     const agentRuntime = getRuntime(agentIdentifier)
 

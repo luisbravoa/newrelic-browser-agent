@@ -21,7 +21,7 @@ import { FeatureBase } from '../../../common/util/feature-base'
 
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator) {
-    super(agentIdentifier, aggregator)
+    super(agentIdentifier, aggregator, 'jserrors')
 
     const agentRuntime = getRuntime(this.agentIdentifier)
     // bail if not instrumented
@@ -49,6 +49,8 @@ export class Aggregate extends FeatureBase {
     this.scheduler = new HarvestScheduler('jserrors', { onFinished: (...args) => this.onHarvestFinished(...args) }, this)
     this.scheduler.harvest.on('jserrors', (...args) => this.onHarvestStarted(...args))
     this.scheduler.startTimer(harvestTimeSeconds)
+
+    console.log("jserrors agg")
   }
 
   onHarvestStarted(options) {

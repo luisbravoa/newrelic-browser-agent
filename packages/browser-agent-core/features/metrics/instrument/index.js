@@ -11,13 +11,15 @@ var SUPPORTABILITY_METRIC = 'sm'
 var CUSTOM_METRIC = 'cm'
 
 export class Instrument extends FeatureBase {
-    constructor(agentIdentifier) {
-        super(agentIdentifier)
+    constructor(agentIdentifier, aggregator) {
+        super(agentIdentifier, aggregator, 'metrics')
         // checks that are run only one time, at script load
         this.singleChecks()
         // listen for messages from features and capture them
         registerHandler('record-supportability', (...args) => this.recordSupportability(...args), undefined, this.ee)
         registerHandler('record-custom', (...args) => this.recordCustom(...args), undefined, this.ee)
+
+        this.importAggregator()
     }
 
     /**

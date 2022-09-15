@@ -14,7 +14,7 @@ import { FeatureBase } from '../../../common/util/feature-base'
 
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator, externalFeatures = []) {
-    super(agentIdentifier, aggregator, externalFeatures)
+    super(agentIdentifier, aggregator, 'ajax', externalFeatures)
     let ajaxEvents = []
     let spaAjaxEvents = {}
     let sentAjaxEvents = []
@@ -91,9 +91,9 @@ export class Aggregate extends FeatureBase {
 
       if (!shouldCollectEvent(params)) {
         if (params.hostname === getInfo(agentIdentifier).errorBeacon) {
-          handle('record-supportability', ['Ajax/Events/Excluded/Agent'])
+          handle('record-supportability', ['Ajax/Events/Excluded/Agent'], undefined, undefined, ee)
         } else {
-          handle('record-supportability', ['Ajax/Events/Excluded/App'])
+          handle('record-supportability', ['Ajax/Events/Excluded/App'], undefined, undefined, ee)
         }
         return
       }

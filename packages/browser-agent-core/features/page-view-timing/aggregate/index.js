@@ -14,7 +14,7 @@ import { getInfo, getConfigurationValue } from '../../../common/config/config'
 import { FeatureBase } from '../../../common/util/feature-base'
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator) {
-    super(agentIdentifier, aggregator)
+    super(agentIdentifier, aggregator, 'page-view-timing')
 
     this.timings = []
     this.timingsSent = []

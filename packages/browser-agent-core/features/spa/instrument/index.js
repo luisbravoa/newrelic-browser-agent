@@ -23,8 +23,8 @@ var win = window
 var location = win.location
 
 export class Instrument extends FeatureBase {
-    constructor(agentIdentifier) {
-        super(agentIdentifier)
+    constructor(agentIdentifier, aggregator) {
+        super(agentIdentifier, aggregator, 'spa')
         const agentRuntime = getRuntime(this.agentIdentifier);
         // loader.xhrWrappable will be false in chrome for ios, but addEventListener is still available.
         // sauce does not have a browser to test this case against, so be careful when modifying this check
@@ -81,28 +81,30 @@ export class Instrument extends FeatureBase {
         function trackURLChange(unusedArgs, hashChangedDuringCb) {
             historyEE.emit('newURL', ['' + location, hashChangedDuringCb])
         }
-    
+
         function startTimestamp() {
             depth++
             startHash = location.hash
             this[FN_START] = now()
         }
-    
+
         function endTimestamp() {
             depth--
             if (location.hash !== startHash) {
                 trackURLChange(0, true)
             }
-    
+
             var time = now()
             this[JS_TIME] = (~~this[JS_TIME]) + time - this[FN_START]
             this[FN_END] = time
         }
-    
+
         function timestamp(ee, type) {
             ee.on(type, function () {
                 this[type] = now()
             })
         }
+
+        this.importAggregator()
     }
 }

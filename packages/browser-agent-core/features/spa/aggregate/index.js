@@ -45,7 +45,7 @@ var originalSetTimeout = originals.ST
 
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator) {
-    super(agentIdentifier, aggregator)
+    super(agentIdentifier, aggregator, 'spa')
 
     this.state = {
       initialPageURL: getRuntime(agentIdentifier).origin,

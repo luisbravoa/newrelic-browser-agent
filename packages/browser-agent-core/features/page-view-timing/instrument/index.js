@@ -10,8 +10,8 @@ import { getConfigurationValue, originals } from '../../../common/config/config'
 import { FeatureBase } from '../../../common/util/feature-base'
 
 export class Instrument extends FeatureBase {
-  constructor(agentIdentifier) {
-    super(agentIdentifier)
+  constructor(agentIdentifier, aggregator) {
+    super(agentIdentifier, aggregator, 'page-view-timing')
     this.pageHiddenTime = initializeHiddenTime()  // synonymous with initial visibilityState
     this.performanceObserver
     this.lcpPerformanceObserver
@@ -54,6 +54,8 @@ export class Instrument extends FeatureBase {
     }
     // page visibility events
     subscribeToVisibilityChange((...args) => this.captureVisibilityChange(...args))
+
+    this.importAggregator()
   }
 
   isEnabled() {

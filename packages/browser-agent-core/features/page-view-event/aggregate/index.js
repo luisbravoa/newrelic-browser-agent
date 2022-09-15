@@ -13,7 +13,7 @@ const jsonp = 'NREUM.setToken'
 
 export class Aggregate extends FeatureBase {
   constructor(agentIdentifier, aggregator) {
-    super(agentIdentifier, aggregator)
+    super(agentIdentifier, aggregator, 'page-view-event')
     this.sendRum()
   }
 
@@ -23,6 +23,7 @@ export class Aggregate extends FeatureBase {
 
   sendRum() {
     const info = getInfo(this.agentIdentifier)
+    console.log("sendRum!", info)
     if (!info.beacon) return
     if (info.queueTime) this.aggregator.store('measures', 'qt', { value: info.queueTime })
     if (info.applicationTime) this.aggregator.store('measures', 'ap', { value: info.applicationTime })

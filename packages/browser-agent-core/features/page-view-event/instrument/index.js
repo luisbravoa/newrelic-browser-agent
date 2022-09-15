@@ -7,14 +7,16 @@ import { FeatureBase } from '../../../common/util/feature-base'
 import { onDOMContentLoaded, onWindowLoad } from '../../../common/window/load'
 
 export class Instrument extends FeatureBase {
-  constructor(agentIdentifier) {
-    super(agentIdentifier)
+  constructor(agentIdentifier, aggregator) {
+    super(agentIdentifier, aggregator, 'page-view-event')
 
     findStartTime(agentIdentifier)
     mark(agentIdentifier, 'firstbyte', getLastTimestamp())
 
     onWindowLoad(() => this.measureWindowLoaded())
     onDOMContentLoaded(() => this.measureDomContentLoaded())
+
+    onWindowLoad(() => this.importAggregator())
   }
 
   // should be called on window.load or window.onload, will not be called if agent is loaded after window load

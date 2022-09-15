@@ -22,8 +22,8 @@ var origRequest = originals.REQ
 var origXHR = window.XMLHttpRequest
 
 export class Instrument extends FeatureBase {
-  constructor(agentIdentifier) {
-    super(agentIdentifier)
+  constructor(agentIdentifier, aggregator) {
+    super(agentIdentifier, aggregator, 'ajax')
     const agentRuntime = getRuntime(this.agentIdentifier);
 
     // Don't instrument Chrome for iOS, it is buggy and acts like there are URL verification issues
@@ -37,6 +37,8 @@ export class Instrument extends FeatureBase {
     this.wrappedFetch = getWrappedFetch(this.ee)
     wrapXhr(this.ee)
     subscribeToEvents(this.agentIdentifier, this.ee, this.handler, this.dt)
+
+    this.importAggregator()
   }
 }
 

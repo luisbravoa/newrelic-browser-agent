@@ -32,6 +32,7 @@ export function getInfo(id) {
 }
 
 export function setInfo(id, obj) {
+  console.log("setInfo", id, obj)
   if (!id) throw new Error('All info objects require an agent identifier!')
   _cache[id] = new Configurable(obj, model)
   gosNREUMInitializedAgents(id, _cache[id], 'info')

@@ -5,7 +5,7 @@ import { FeatureBase } from "../../../common/util/feature-base";
 
 export class Aggregate extends FeatureBase {
     constructor(agentIdentifier, aggregator) {
-        super(agentIdentifier, aggregator)
+        super(agentIdentifier, aggregator, 'metrics')
 
         registerHandler('storeMetric', (...args) => this.storeMetric(...args), undefined, this.ee)
         registerHandler('storeEventMetrics', (...args) => this.storeEventMetrics(...args), undefined, this.ee)

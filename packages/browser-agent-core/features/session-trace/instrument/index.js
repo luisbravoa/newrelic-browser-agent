@@ -25,8 +25,8 @@ var PUSH_STATE = 'pushState'
 
 var origEvent = originals.EV
 export class Instrument extends FeatureBase {
-  constructor(agentIdentifier) {
-    super(agentIdentifier)
+  constructor(agentIdentifier, aggregator) {
+    super(agentIdentifier, aggregator, 'session-trace')
 
     if (!(window.performance &&
       window.performance.timing &&
@@ -137,6 +137,8 @@ export class Instrument extends FeatureBase {
     document[ADD_EVENT_LISTENER]('scroll', this.noOp, eventListenerOpts(false))
     document[ADD_EVENT_LISTENER]('keypress', this.noOp, eventListenerOpts(false))
     document[ADD_EVENT_LISTENER]('click', this.noOp, eventListenerOpts(false))
+
+    this.importAggregator()
   }
 
   noOp(e) { /* no-op */ }
