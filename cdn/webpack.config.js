@@ -57,8 +57,12 @@ console.log("IS_LOCAL", IS_LOCAL)
 
 module.exports = {
   entry: {
+    [`nr-loader-rum${PATH_VERSION}`]: [path.resolve(__dirname, './agent-loader/lite.js')],
+    [`nr-loader-rum${PATH_VERSION}.min`]: path.resolve(__dirname, './agent-loader/lite.js'),
     [`nr-loader-full${PATH_VERSION}`]: path.resolve(__dirname, './agent-loader/loader.js'),
     [`nr-loader-full${PATH_VERSION}.min`]: path.resolve(__dirname, './agent-loader/loader.js'),
+    [`nr-loader-spa${PATH_VERSION}`]: path.resolve(__dirname, './agent-loader/spa.js'),
+    [`nr-loader-spa${PATH_VERSION}.min`]: path.resolve(__dirname, './agent-loader/spa.js'),
     [`nr-polyfills${PATH_VERSION}.min`]: path.resolve(__dirname, './agent-loader/polyfills.js')
   },
   output: {

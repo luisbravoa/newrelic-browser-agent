@@ -49,8 +49,6 @@ export class Aggregate extends FeatureBase {
     this.scheduler = new HarvestScheduler('jserrors', { onFinished: (...args) => this.onHarvestFinished(...args) }, this)
     this.scheduler.harvest.on('jserrors', (...args) => this.onHarvestStarted(...args))
     this.scheduler.startTimer(harvestTimeSeconds)
-
-    console.log("jserrors agg")
   }
 
   onHarvestStarted(options) {

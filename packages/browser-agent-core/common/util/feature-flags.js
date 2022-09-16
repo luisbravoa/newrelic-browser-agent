@@ -18,7 +18,6 @@ export function activateFeatures (flags, agentIdentifier) {
 }
 
 function drainAll(agentIdentifier) {
-  console.log("drainAll...")
   drain(agentIdentifier, 'api')
   drain(agentIdentifier, 'feature')
 }

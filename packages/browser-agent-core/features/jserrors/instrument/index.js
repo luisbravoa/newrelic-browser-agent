@@ -91,7 +91,6 @@ export class Instrument extends FeatureBase {
     this.importAggregator()
   }
 
-  
   // FF and Android browsers do not provide error info to the 'error' event callback,
   // so we must use window.onerror
   onerrorHandler(message, filename, lineno, column, errorObj) {
