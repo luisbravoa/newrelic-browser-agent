@@ -4,7 +4,7 @@
 */
 import { wrapMutation, wrapPromise, wrapHistory, wrapEvents, wrapTimer, wrapFetch, wrapXhr, wrapJson } from '../../../common/wrap'
 import { eventListenerOpts } from '../../../common/event-listener/event-listener-opts'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 import { getRuntime } from '../../../common/config/config'
 import { now } from '../../../common/timing/now'
 
@@ -22,7 +22,7 @@ var ADD_EVENT_LISTENER = 'addEventListener'
 var win = window
 var location = win.location
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
     constructor(agentIdentifier, aggregator) {
         super(agentIdentifier, aggregator, 'spa')
         const agentRuntime = getRuntime(this.agentIdentifier);

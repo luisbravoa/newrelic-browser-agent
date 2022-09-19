@@ -16,10 +16,9 @@ import { handle } from '../../../common/event-emitter/handle'
 import { mapOwn } from '../../../common/util/map-own'
 import { getInfo, getConfigurationValue, getRuntime } from '../../../common/config/config'
 import { now } from '../../../common/timing/now'
+import { AggregateBase } from '../../../common/util/feature-base'
 
-import { FeatureBase } from '../../../common/util/feature-base'
-
-export class Aggregate extends FeatureBase {
+export class Aggregate extends AggregateBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'jserrors')
 

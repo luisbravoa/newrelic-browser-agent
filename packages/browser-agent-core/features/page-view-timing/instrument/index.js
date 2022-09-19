@@ -7,9 +7,9 @@ import { subscribeToVisibilityChange, initializeHiddenTime } from '../../../comm
 import { eventListenerOpts } from '../../../common/event-listener/event-listener-opts'
 import { getOffset, now } from '../../../common/timing/now'
 import { getConfigurationValue, originals } from '../../../common/config/config'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'page-view-timing')
     this.pageHiddenTime = initializeHiddenTime()  // synonymous with initial visibilityState

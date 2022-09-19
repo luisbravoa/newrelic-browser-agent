@@ -10,9 +10,9 @@ import { getConfigurationValue, getInfo } from '../../../common/config/config'
 import { HarvestScheduler } from '../../../common/harvest/harvest-scheduler'
 import { subscribeToUnload } from '../../../common/unload/unload'
 import { setDenyList, shouldCollectEvent } from '../../../common/deny-list/deny-list'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { AggregateBase } from '../../../common/util/feature-base'
 
-export class Aggregate extends FeatureBase {
+export class Aggregate extends AggregateBase {
   constructor(agentIdentifier, aggregator, externalFeatures = []) {
     super(agentIdentifier, aggregator, 'ajax', externalFeatures)
     let ajaxEvents = []

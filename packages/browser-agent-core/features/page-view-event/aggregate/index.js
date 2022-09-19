@@ -7,11 +7,11 @@ import { addMetric as addPaintMetric } from '../../../common/metrics/paint-metri
 import { submitData } from '../../../common/util/submit-data'
 import { getConfigurationValue, getInfo, getRuntime } from '../../../common/config/config'
 import { HarvestScheduler } from '../../../common/harvest/harvest-scheduler'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { AggregateBase } from '../../../common/util/feature-base'
 
 const jsonp = 'NREUM.setToken'
 
-export class Aggregate extends FeatureBase {
+export class Aggregate extends AggregateBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'page-view-event')
     this.sendRum()
@@ -23,7 +23,6 @@ export class Aggregate extends FeatureBase {
 
   sendRum() {
     const info = getInfo(this.agentIdentifier)
-    console.log("sendRum!", info)
     if (!info.beacon) return
     if (info.queueTime) this.aggregator.store('measures', 'qt', { value: info.queueTime })
     if (info.applicationTime) this.aggregator.store('measures', 'ap', { value: info.applicationTime })

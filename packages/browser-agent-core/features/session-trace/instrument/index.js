@@ -8,7 +8,7 @@ import { supportsPerformanceObserver } from '../../../common/window/supports-per
 import { eventListenerOpts } from '../../../common/event-listener/event-listener-opts'
 import { originals, getRuntime } from '../../../common/config/config'
 import { now } from '../../../common/timing/now'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 
 var learResourceTimings = 'learResourceTimings'
 var ADD_EVENT_LISTENER = 'addEventListener'
@@ -24,10 +24,10 @@ var BST_TIMER = 'bstTimer'
 var PUSH_STATE = 'pushState'
 
 var origEvent = originals.EV
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'session-trace')
-
+    
     if (!(window.performance &&
       window.performance.timing &&
       window.performance.getEntriesByType

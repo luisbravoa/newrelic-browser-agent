@@ -13,7 +13,7 @@ import { paintMetrics } from '../../../common/metrics/paint-metrics'
 import { Interaction } from './interaction'
 import { getConfigurationValue, originals, getRuntime } from '../../../common/config/config'
 import { eventListenerOpts } from '../../../common/event-listener/event-listener-opts'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { AggregateBase } from '../../../common/util/feature-base'
 import { HarvestScheduler } from '../../../common/harvest/harvest-scheduler'
 import { Serializer } from './serializer'
 import { ee } from '../../../common/event-emitter/contextual-ee'
@@ -43,7 +43,7 @@ var JSONP_END = 'jsonp-end'
 
 var originalSetTimeout = originals.ST
 
-export class Aggregate extends FeatureBase {
+export class Aggregate extends AggregateBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'spa')
 
@@ -118,7 +118,7 @@ export class Aggregate extends FeatureBase {
     //  | click ending:                   |   65  |    50    |        |           |           |
     // click fn-end                       |   70  |    0     |    0   |     70    |     20    |
 
-    baseEE.on('feat-spa', function () {
+    // baseEE.on('feat-spa', function () {
       if (!isEnabled()) return
 
       state.initialPageLoad = new Interaction('initialPageLoad', 0, state.lastSeenUrl, state.lastSeenRouteName, onInteractionFinished, agentIdentifier)
@@ -585,7 +585,7 @@ export class Aggregate extends FeatureBase {
       function activeNodeFor(interaction) {
         return (state.currentNode && state.currentNode[INTERACTION] === interaction) ? state.currentNode : interaction.root
       }
-    })
+    // })
 
     function saveNode(val, overwrite) {
       if (overwrite || !this[SPA_NODE]) this[SPA_NODE] = state.currentNode

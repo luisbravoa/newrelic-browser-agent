@@ -13,7 +13,7 @@ import { wrapFetch, wrapXhr } from '../../../common/wrap'
 import { parseUrl } from '../../../common/url/parse-url'
 import { DT } from './distributed-tracing'
 import { responseSizeFromXhr } from './response-size'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 
 var handlers = ['load', 'error', 'abort', 'timeout']
 var handlersLen = handlers.length
@@ -21,7 +21,7 @@ var handlersLen = handlers.length
 var origRequest = originals.REQ
 var origXHR = window.XMLHttpRequest
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'ajax')
     const agentRuntime = getRuntime(this.agentIdentifier);

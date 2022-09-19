@@ -10,11 +10,11 @@ import { getOrSet } from '../../../common/util/get-or-set'
 import { wrapRaf, wrapTimer, wrapEvents, wrapXhr } from '../../../common/wrap'
 import slice from 'lodash._slice'
 import './debug'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 
 var NR_ERR_PROP = 'nr@seenError'
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'jserrors')
     // skipNext counter to keep track of uncaught

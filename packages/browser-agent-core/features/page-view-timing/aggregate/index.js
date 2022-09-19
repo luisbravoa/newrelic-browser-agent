@@ -11,8 +11,8 @@ import { registerHandler } from '../../../common/event-emitter/register-handler'
 import { cleanURL } from '../../../common/url/clean-url'
 import { handle } from '../../../common/event-emitter/handle'
 import { getInfo, getConfigurationValue } from '../../../common/config/config'
-import { FeatureBase } from '../../../common/util/feature-base'
-export class Aggregate extends FeatureBase {
+import { AggregateBase } from '../../../common/util/feature-base'
+export class Aggregate extends AggregateBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'page-view-timing')
 

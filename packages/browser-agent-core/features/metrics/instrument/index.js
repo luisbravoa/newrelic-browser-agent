@@ -1,6 +1,6 @@
 import { handle } from '../../../common/event-emitter/handle'
 import { registerHandler } from '../../../common/event-emitter/register-handler'
-import { FeatureBase } from '../../../common/util/feature-base'
+import {  InstrumentBase } from '../../../common/util/feature-base'
 import { getFrameworks } from '../../../common/metrics/framework-detection'
 import { protocol } from '../../../common/url/protocol'
 import { getRules, validateRules } from '../../../common/util/obfuscate'
@@ -10,7 +10,7 @@ import { onDOMContentLoaded } from '../../../common/window/load'
 var SUPPORTABILITY_METRIC = 'sm'
 var CUSTOM_METRIC = 'cm'
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
     constructor(agentIdentifier, aggregator) {
         super(agentIdentifier, aggregator, 'metrics')
         // checks that are run only one time, at script load

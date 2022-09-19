@@ -1,9 +1,9 @@
 import { getConfigurationValue } from "../../../common/config/config";
 import { registerHandler } from "../../../common/event-emitter/register-handler";
 import { HarvestScheduler } from "../../../common/harvest/harvest-scheduler";
-import { FeatureBase } from "../../../common/util/feature-base";
+import { AggregateBase } from "../../../common/util/feature-base";
 
-export class Aggregate extends FeatureBase {
+export class Aggregate extends AggregateBase {
     constructor(agentIdentifier, aggregator) {
         super(agentIdentifier, aggregator, 'metrics')
 
@@ -12,7 +12,7 @@ export class Aggregate extends FeatureBase {
 
         var harvestTimeSeconds = getConfigurationValue(this.agentIdentifier, 'jserrors.harvestTimeSeconds') || 10
 
-        var scheduler = new HarvestScheduler('jserrors', { }, this)
+        var scheduler = new HarvestScheduler('jserrors', {}, this)
         scheduler.startTimer(harvestTimeSeconds)
         scheduler.harvest.on('jserrors', () => ({ body: this.aggregator.take(['cm', 'sm']) }))
     }

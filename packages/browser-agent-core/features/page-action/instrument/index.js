@@ -4,9 +4,9 @@
  */
 
 import { getRuntime } from '../../../common/config/config'
-import { FeatureBase } from '../../../common/util/feature-base'
+import { InstrumentBase } from '../../../common/util/feature-base'
 
-export class Instrument extends FeatureBase {
+export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'page-action')
     const agentRuntime = getRuntime(this.agentIdentifier)
