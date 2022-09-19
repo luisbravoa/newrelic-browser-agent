@@ -3,7 +3,7 @@ import { setConfiguration, setInfo, setLoaderConfig, setRuntime } from '../confi
 import { setAPI } from '../api/api'
 import { activateFeatures } from '../util/feature-flags'
 
-export function configure(agentIdentifier, { init = gosCDN().init, info = gosCDN().info, loader_config = gosCDN().loader_config, exposed = true }) {
+export function configure(agentIdentifier, { init, info, loader_config, exposed = true }) {
     const api = {}
 
     setInfo(agentIdentifier, info)

@@ -20,10 +20,11 @@ export function getFrozenAttributes(feature) {
         case 'page_view_timing':
         case 'session_trace':
         case 'spa':
-            return ['auto'] 
-            // right now, jserrors is the only feature that can turn "off" page-level auto-instrumentation...
+            return ['auto', 'harvestTimeSeconds'] 
+            // right now, jserrors is the only feature that can have "on" or "off" page-level auto-instrumentation...
+            // page_action is always "off" (no instr)
             // as new API/manual implementation methods are added, this list can likely be pruned
         default:
-            return []
+            return ['harvestTimeSeconds']
     }
 }
