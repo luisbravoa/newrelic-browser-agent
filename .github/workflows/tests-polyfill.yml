@@ -375,6 +375,7 @@ jobs:
   check-failures:
     runs-on: ubuntu-latest
     container: node:14
+    continue-on-error: true
     needs: [chrome-functional, chrome-unit, firefox-functional, firefox-unit, safari-functional, safari-unit, edge-functional, edge-unit, ios-functional, ios-unit, android-functional, android-unit, ie-functional, ie-unit]
     env:
       BUILD_NUMBER: PR${{ github.event.number }}-unit-${{ github.run_number }}

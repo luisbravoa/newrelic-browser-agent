@@ -42,8 +42,8 @@ const queryNR = async () => {
 
     }
     failures?.data?.actor?.account?.nrql?.results.forEach(x => {
-        failedTests[x.browserName.toLowerCase()][x.browserVersion] = failedTests[x.browserName.toLowerCase()][x.browserVersion] ? failedTests[x.browserName.toLowerCase()][x.browserVersion] : new Set()
-        failedTests[x.browserName.toLowerCase()][x.browserVersion].add(x.testFileName)
+        failedTests[x.browserName.toLowerCase()][x.browserVersion || x.version] = failedTests[x.browserName.toLowerCase()][x.browserVersion || x.version] ? failedTests[x.browserName.toLowerCase()][x.browserVersion || x.version] : new Set()
+        failedTests[x.browserName.toLowerCase()][x.browserVersion || x.version].add(x.testFileName)
     })
 
     console.log("---- FAILED TESTS ----")
