@@ -14,6 +14,7 @@ const glob = require('glob')
 const Driver = require('../driver')
 const loadBrowser = require('../loader/loadBrowser')
 const { getSauceLabsCreds, startExternalServices, stopExternalServices } = require('../util/external-services')
+const coverage = require('../coverage/coverage')
 
 const buildIdentifier = getBuildIdentifier()
 const output = new Output(config)
@@ -29,6 +30,10 @@ process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection:')
   console.log(reason)
 })
+
+process.on('beforeExit', (code) => {
+  if (config.coverage) coverage.getTestedFiles()
+});
 
 let tunnelIdentifier = process.env.USER + '@' + os.hostname()
 

@@ -37,7 +37,8 @@
     "sauce:get-browsers": "node ./tools/jil/util/sauce-browsers",
     "tools:test-builds": "npm --prefix ./tools/test-builds/build-time-mfe run build",
     "lerna:bootstrap": "npx lerna bootstrap",
-    "lerna:test": "npx lerna run test"
+    "lerna:test": "npx lerna run test",
+    "coverage": "npx nyc node tools/jil/bin/cli.js"
   },
   "config": {
     "unsafe-perm": true
@@ -66,6 +67,7 @@
     "babel-loader": "^8.2.5",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
+    "browserify-istanbul": "^3.0.1",
     "bundle-collapser": "^1.2.1",
     "create-polyfill-service-url": "^2.2.6",
     "eslint": "8.8",
@@ -78,12 +80,14 @@
     "husky": "^0.11.6",
     "jung": "^2.1.0",
     "lerna": "^4.0.0",
+    "nyc": "^15.1.0",
     "pre-commit": "^1.2.2",
     "preprocessify": "0.0.6",
     "request": "2.74.0",
     "sinon": "^1.17.5",
     "tap-parser": "^1.2.2",
     "tape": "^4.8.0",
+    "tape-istanbul": "^1.2.0",
     "through": "^2.3.8",
     "through2": "^2.0.1",
     "vinyl-buffer": "^1.0.1",

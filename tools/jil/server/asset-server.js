@@ -22,6 +22,9 @@ const assert = require('assert')
 const preprocessify = require('preprocessify')
 const loaders = require('../../../loaders')
 const UglifyJS = require('uglify-js')
+const coverage = require('../coverage/coverage')
+// const istanbul = require('browserify-istanbul');
+// var tapeIstanbul = require('tape-istanbul')
 var runnerArgs = require('../runner/args')
 
 mime.types['es6'] = 'application/javascript'
@@ -284,6 +287,9 @@ class BrowserifyTransform extends AssetTransform {
     if (result) return callback(null, result)
 
     browserify(assetPath)
+      .on('dep', function (dep) {
+        if (dep.file.includes("browser-agent-core/") && runnerArgs.coverage) coverage.browserAgentFiles.set(dep.file.split('browser-agent-core/')[1], true)
+      })
       .transform("babelify", {
         presets: [
           ["@babel/preset-env", {
@@ -306,13 +312,14 @@ class BrowserifyTransform extends AssetTransform {
       .transform(preprocessify())
       .bundle((err, buf) => {
         if (err) return callback(err)
-
         let content = buf.toString()
 
         if (this.config.cache) this.browserifyCache[assetPath] = content
 
         callback(err, content)
       })
+
+
   }
 }
 

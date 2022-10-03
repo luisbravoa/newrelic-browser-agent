@@ -114,6 +114,11 @@ module.exports = yargs
   .alias('P', 'polyfills')
   .describe('P', 'Add Polyfills script to top of page')
 
+  .boolean('cov')
+  .default('cov', true)
+  .alias('cov', 'coverage')
+  .describe('cov', 'Generate basic import coverage list (browser tests only)')
+
   .help('h')
   .alias('h', 'help')
   .strict()
