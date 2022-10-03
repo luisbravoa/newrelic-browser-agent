@@ -1,0 +1,38 @@
+/*
+ * Copyright 2020 New Relic Corporation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import t from '../utils/JILtoJest'
+import { reduce } from '../../common/util/reduce.js'
+
+test('reduce', done => {
+  var nums = [ 1, 5, 10 ]
+  t.equal(reduce(nums, add, 0), 16)
+  t.equal(reduce(nums, add), 16, 'implicit starting value')
+
+  var objs = [
+    {name: 'a', value: 33},
+    {name: 'b', value: 22},
+    {name: 'c', value: 11}
+  ]
+
+  var obj = reduce(objs, build, {})
+
+  t.equal(obj.b, 22, 'object reduce')
+
+  var strs = [ 'a', 'b', 'c' ]
+
+  t.equal(reduce(strs, add, ''), 'abc', 'correct order')
+
+  done()
+})
+
+function add (a, b) {
+  return a + b
+}
+
+function build (result, item) {
+  result[item.name] = item.value
+  return result
+}

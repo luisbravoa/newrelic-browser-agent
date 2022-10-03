@@ -1,0 +1,58 @@
+/*
+ * Copyright 2020 New Relic Corporation. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import t from '../utils/JILtoJest'
+
+import {setup} from '../utils/setup'
+import {drain} from '../../common/drain/drain'
+import {handle} from '../../common/event-emitter/handle'
+import {Aggregate as PvtAggregate} from '../../features/page-view-timing/aggregate/index'
+
+const {agentIdentifier, aggregator} = setup()
+
+test('LCP event with CLS attribute', done => {
+  const pvtAgg = new PvtAggregate(agentIdentifier, aggregator)
+
+  // override harvest calls, so that no network calls are made
+  pvtAgg.scheduler.harvest.send = function() {
+    return {}
+  }
+
+  // prevent prepareHarvest from clearing timings
+  pvtAgg.prepareHarvest = function() {
+    return {}
+  }
+
+  // drain adds `timing` and `lcp` event listeners in the agent/timings module
+  drain(agentIdentifier, 'feature')
+
+  handle('cls', [{ value: 1 }], undefined, undefined, pvtAgg.ee)
+  handle('lcp', [{ size: 1, startTime: 1 }], undefined, undefined, pvtAgg.ee)
+  handle('cls', [{ value: 2 }], undefined, undefined, pvtAgg.ee)
+
+  // invoke final harvest, which includes harvesting LCP
+  pvtAgg.finalHarvest()
+
+  var timing = find(pvtAgg.timings, function(t) {
+    return t.name === 'lcp'
+  })
+
+  t.equal(timing.attrs.cls, 1, 'CLS value should be the one present at the time LCP happened')
+
+  done()
+})
+
+function find(arr, fn) {
+  if (arr.find) {
+    return arr.find(fn)
+  }
+  var match = null
+  arr.forEach(function(t) {
+    if (fn(t)) {
+      match = t
+    }
+  })
+  return match
+}

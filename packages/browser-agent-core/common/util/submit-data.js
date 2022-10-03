@@ -9,8 +9,8 @@ submitData.jsonp = function jsonp (url, jsonp) {
   var element = document.createElement('script')
   element.type = 'text/javascript'
   element.src = url + '&jsonp=' + jsonp
-  var firstScript = document.getElementsByTagName('script')[0]
-  firstScript.parentNode.insertBefore(element, firstScript)
+  var firstScript = document.getElementsByTagName('script')?.[0]
+  firstScript?.parentNode.insertBefore(element, firstScript) || document.head.prepend(element)
   return element
 }
 

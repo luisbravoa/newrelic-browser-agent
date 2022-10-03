@@ -4,6 +4,8 @@
     "ecmaVersion": 2020
   },
   "rules": {
-    "no-undef": "warn"
+    "no-undef": "warn",
+    "no-import-assign": "warn",
+    "import/namespace": "warn"
   }
 }
