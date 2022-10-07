@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    {init}
+    {config}
+    <script>
+        NREUM.init.page_view_event = { auto: false }
+    </script>
+    {loader}
+</head>
+
+<body>
+
+    <script>
+        setTimeout(() => {
+            newrelic.noticeError("noticeError")
+            console.log("noticed error")
+            console.log("threw error")
+            throw new Error("throw Error")
+        }, 5000)
+    </script>
+</body>
+
+</html>

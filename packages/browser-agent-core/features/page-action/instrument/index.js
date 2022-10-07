@@ -9,10 +9,6 @@ import { InstrumentBase } from '../../../common/util/feature-base'
 export class Instrument extends InstrumentBase {
   constructor(agentIdentifier, aggregator) {
     super(agentIdentifier, aggregator, 'page-action')
-    const agentRuntime = getRuntime(this.agentIdentifier)
-    // Turn on feature
-    agentRuntime.features.ins = true
-
     this.importAggregator()
   }
 }

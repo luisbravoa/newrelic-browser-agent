@@ -23,8 +23,7 @@ export class Aggregate extends AggregateBase {
     const agentRuntime = getRuntime(agentIdentifier)
 
     if (!xhrUsable) return
-    // bail if not instrumented
-    if (!agentRuntime.features.stn || !agentRuntime.xhrWrappable) return
+    if (!agentRuntime.xhrWrappable) return
 
     this.ptid = ''
     this.ignoredEvents = {
@@ -70,8 +69,8 @@ export class Aggregate extends AggregateBase {
     this.trace = {}
     this.nodeCount = 0
     this.sentTrace = null
-    this.harvestTimeSeconds = getConfigurationValue(agentIdentifier, 'stn.harvestTimeSeconds') || 10
-    this.maxNodesPerHarvest = getConfigurationValue(agentIdentifier, 'stn.maxNodesPerHarvest') || 1000
+    this.harvestTimeSeconds = getConfigurationValue(agentIdentifier, 'session_trace.harvestTimeSeconds') || 10
+    this.maxNodesPerHarvest = getConfigurationValue(agentIdentifier, 'session_trace.maxNodesPerHarvest') || 1000
 
     this.laststart = 0
     findStartTime(agentIdentifier)

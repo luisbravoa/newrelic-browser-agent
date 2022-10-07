@@ -110,6 +110,7 @@ export function setAPI(agentIdentifier, nr = gosNREUM()) {
   }
 
   nr.noticeError = function (err, customAttributes) {
+    console.log("noticeError...", agentIdentifier)
     if (typeof err === 'string') err = new Error(err)
     handle('record-supportability', ['API/noticeError/called'], undefined, undefined, instanceEE)
     handle('err', [err, now(), false, customAttributes], undefined, undefined, instanceEE)

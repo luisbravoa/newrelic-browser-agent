@@ -24,6 +24,7 @@ export function getFrozenAttributes(feature) {
             // right now, jserrors is the only feature that can have "on" or "off" page-level auto-instrumentation...
             // page_action is always "off" (no instr)
             // as new API/manual implementation methods are added, this list can likely be pruned
+        case 'jserrors':
         default:
             return ['harvestTimeSeconds']
     }

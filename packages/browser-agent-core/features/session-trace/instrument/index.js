@@ -33,8 +33,6 @@ export class Instrument extends InstrumentBase {
       window.performance.getEntriesByType
     )) return
 
-    getRuntime(this.agentIdentifier).features.stn = true
-
     const ee = this.ee
 
     this.timerEE = wrapTimer(this.ee)

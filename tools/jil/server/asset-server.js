@@ -22,6 +22,7 @@ const assert = require('assert')
 const preprocessify = require('preprocessify')
 const loaders = require('../../../loaders')
 const UglifyJS = require('uglify-js')
+var runnerArgs = require('../runner/args')
 
 mime.types['es6'] = 'application/javascript'
 
@@ -152,11 +153,31 @@ class AgentInjectorTransform extends AssetTransform {
           }
         };
       })()
+      var origOnError = window.onerror
+      window.onerror = function() {
+        NRDEBUG(\`error thrown: \${JSON.stringify(arguments)}\`)
+        origOnError(arguments)
+      }
+      var origLog = window.console.log
+      window.console.log = function() {
+        NRDEBUG(\`console.log: \${JSON.stringify(arguments)}\`)
+        origLog(arguments)
+      }
+      var origWarn = window.console.warn
+      window.console.warn = function() {
+        NRDEBUG(\`console.warn: \${JSON.stringify(arguments)}\`)
+        origWarn(arguments)
+      }
+      var origErr = window.console.error
+      window.console.error = function() {
+        NRDEBUG(\`console.error: \${JSON.stringify(arguments)}\`)
+        origErr(arguments)
+      }
     `
   }
 
   getLoaderContent(loaderName, dir, callback) {
-    let loaderFilename = `nr-loader-${loaderName}.min.js`
+    let loaderFilename = `nr-loader-${loaderName}${runnerArgs.polyfills ? '-polyfills' : ''}.min.js`
     let loaderPath = path.join(dir, loaderFilename)
     fs.readFile(loaderPath, callback)
   }
@@ -192,6 +213,8 @@ class AgentInjectorTransform extends AssetTransform {
       const packagePaths = htmlPackageTags.map(x => x.replace(/[{}]/g, ''))
       const packageFiles = await this.getBuiltPackages(packagePaths)
 
+
+
       this.getLoaderContent(
         loaderName,
         this.buildDir,
@@ -221,7 +244,10 @@ class AgentInjectorTransform extends AssetTransform {
             .replace('{config}', tagify(disableSsl + configContent))
             .replace('{init}', tagify(disableSsl + initContent))
             .replace('{script}', `<script src="${params.script}" charset="utf-8"></script>`)
-            .replace('{polyfills}', `<script type="text/javascript">${this.polyfills}</script>`)
+
+          if (runnerArgs.polyfills) {
+            rspData = rspData.replace('{polyfills}', `<script type="text/javascript">${this.polyfills}</script>`)
+          }
 
           if (!!htmlPackageTags.length && !!packageFiles.length) {
             packageFiles.forEach(pkg => {
@@ -258,7 +284,7 @@ class BrowserifyTransform extends AssetTransform {
     if (result) return callback(null, result)
 
     browserify(assetPath)
-    .transform("babelify", {
+      .transform("babelify", {
         presets: [
           ["@babel/preset-env", {
             loose: true,
