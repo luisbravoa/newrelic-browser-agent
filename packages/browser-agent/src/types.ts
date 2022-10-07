@@ -1,43 +1,49 @@
-export interface NrInterface {
-    config: { info: NrInfo, config: NrConfig, loader_config: NrLoaderConfig };
-    features: AppFeatures;
-    start: NrInitialize,
-    noticeError: NrNoticeError
+export interface BrowserAgent{
+    config: NrOptions;
+    start: (options: NrOptions ) => Promise<boolean>;
+    sharedAggregator: 
+    // features
+    // agentIdentifier
+    // setErrorHandler
+    // finished
+    // addToTrace
+    // inlineHit
+    // addRelease
+    // addPageAction
+    // setCurrentRouteName
+    // setPageViewName
+    // setCustomAttribute
+    // interaction
+    // noticeError
 }
 
-export class NrFeature {
-    private _enabled: boolean = true
-    private _auto: boolean = true
-    
-    constructor(public name: NrFeatures){}
-
-    get enabled (): boolean {
-        return this._enabled
-    }
-
-    set enabled(val: boolean) {
-        this._enabled = Boolean(val)
-    }
-
-    get auto(): boolean {
-        return this._auto
-    }
-
-    set auto(val: boolean) {
-        this._auto = val
-    }
+export interface NrOptions {
+    info: NrInfo,
+    init: NrInit,
+    loader_config: NrLoaderConfig,
+    runtime: NrRuntime,
+    exposed: boolean
 }
-export interface AppFeatures {
-    'errors': NrFeature,
-    'metrics': NrFeature
-}
-
-export interface NrOptions extends NrInfo, NrConfig, NrLoaderConfig {}
 
 interface NrShared {
     applicationID?: string;
     licenseKey?: string;
 }
+
+export interface NrRuntime {
+    customTransaction?: any,
+    disabled?: boolean,
+    features?: {},
+    maxBytes?: boolean,
+    offset?: number,
+    onerror?: () => any,
+    origin?: string,
+    ptid?: string,
+    releaseIds?: {},
+    sessionId?: string,
+    xhrWrappable?: boolean,
+    userAgent?: string
+  }
 
 export interface NrInfo extends NrShared {
     applicationID: string;
@@ -58,9 +64,9 @@ export interface NrInfo extends NrShared {
     tNamePlain?: string; 
 }
 
-export interface NrConfig {
-    privacy?: { cookies_enabled?: boolean }
-    ajax?: {deny_list?: string[]}
+export interface NrInit {
+    privacy?: { cookies_enabled?: boolean }, // *cli - per discussion, default should be boolean
+    ajax?: { deny_list?: string, enabled?: boolean, auto?: boolean, harvestTimeSeconds?: number },
     distributed_tracing?: {
         enabled?: boolean
         exclude_newrelic_header?: boolean
@@ -68,9 +74,15 @@ export interface NrConfig {
         cors_use_tracecontext_headers?: boolean
         allowed_origins?: string[]
     }
-    page_view_timing?: { enabled?: boolean };
-    ssl?: boolean;
-    obfuscate?: {regex?: string | RegExp, replacement?: string}[]
+    ssl?: boolean,
+    obfuscate?: {regex?: string | RegExp, replacement?: string}[],
+    jserrors?: {enabled?: boolean, auto?: boolean, harvestTimeSeconds?: number},
+    metrics?: {enabled?: boolean, auto?: boolean},
+    page_action?: {enabled?: boolean, auto?: false, harvestTimeSeconds?: number},
+    page_view_event?: {enabled?: boolean, auto?: boolean},
+    page_view_timing?: {enabled?: boolean, auto?: boolean, harvestTimeSeconds?: number},
+    session_trace?: {enabled?: boolean, auto?: boolean, harvestTimeSeconds?: number},
+    spa?: {enabled?: boolean, auto?: boolean, harvestTimeSeconds?: number}
 }
 
 export interface NrLoaderConfig extends NrShared {
@@ -82,26 +94,4 @@ export interface NrLoaderConfig extends NrShared {
     applicationID: string,
 }
 
-export enum NrFeatures {
-    JSERRORS='jserrors',
-    METRICS='metrics'
-    // AJAX='AJAX',
-    // PAGE_VIEW_EVENT='PAGE_VIEW_EVENT',
-    // PAGE_VIEW_TIMING='PAGE_VIEW_TIMING'
-}
-
-export type NrStoreError = (err: Error | String, time?: Number, internal?: any, customAttributes?: any) => void
-export type NrInitialize = (opts: NrOptions) => Promise<Boolean>
 export type NrNoticeError = (err: Error | String, customAttributes: Object) => void;
-export interface NrFeaturesWithApi { 
-    [NrFeatures.JSERRORS]: {
-        noticeError: NrStoreError
-    },
-    // [NrFeatures.AJAX]: {},
-    // [NrFeatures.PAGE_VIEW_EVENT]: {},
-    // [NrFeatures.PAGE_VIEW_TIMING]: {}
-}
-
-export interface NrImportPaths {
-    aggregate: string, instrument: string
-}

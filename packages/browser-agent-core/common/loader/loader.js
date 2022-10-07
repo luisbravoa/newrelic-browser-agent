@@ -3,7 +3,7 @@ import { configure } from './configure'
 import { Aggregator } from '../aggregate/aggregator'
 import { gosCDN, gosNREUMInitializedAgents } from '../window/nreum'
 import { generateRandomHexString } from '../ids/unique-id'
-import { getConfiguration, getInfo, getLoaderConfig } from '../config/config'
+import { getConfiguration, getInfo, getLoaderConfig, getRuntime } from '../config/config'
 import { drain } from '../drain/drain'
 import { getFeatureDependencyNames } from './featureDependencies'
 
@@ -20,35 +20,41 @@ export class BrowserAgent {
     get config() {
         return {
             info: getInfo(this.agentIdentifier),
-            config: getConfiguration(this.agentIdentifier),
-            loader_config: getLoaderConfig(this.agentIdentifier)
+            init: getConfiguration(this.agentIdentifier),
+            loader_config: getLoaderConfig(this.agentIdentifier),
+            runtime: getRuntime(this.agentIdentifier)
         }
     }
 
     async start(options) {
-        Object.assign(this, configure(this.agentIdentifier, options))
-        const enabledFeatures = getEnabledFeatures(this.agentIdentifier)
-        const completed = []
-        await Promise.all(featureNames.map(async f => {
-            if (enabledFeatures[f]) {
-                const dependencies = getFeatureDependencyNames(f.replace(/_/g, '-'))
-                const hasAllDeps = dependencies.every(x => enabledFeatures[x.replace(/-/g, '_')])
-                if (!hasAllDeps) console.warn(`New Relic: ${f} is enabled but one or more dependent features has been disabled (${JSON.stringify(dependencies)}). This may cause unintended consequences or missing data...`)
+        try {
+            Object.assign(this, configure(this.agentIdentifier, options))
+            const enabledFeatures = getEnabledFeatures(this.agentIdentifier)
+            const completed = []
+            await Promise.all(featureNames.map(async f => {
+                if (enabledFeatures[f]) {
+                    const dependencies = getFeatureDependencyNames(f.replace(/_/g, '-'))
+                    const hasAllDeps = dependencies.every(x => enabledFeatures[x.replace(/-/g, '_')])
+                    if (!hasAllDeps) console.warn(`New Relic: ${f} is enabled but one or more dependent features has been disabled (${JSON.stringify(dependencies)}). This may cause unintended consequences or missing data...`)
 
-                if (isAuto(f, this.agentIdentifier)) {
-                    const { Instrument } = await import(`../../features/${f.replace(/_/g, '-')}/instrument`)
-                    this.features[f] = new Instrument(this.agentIdentifier, this.sharedAggregator)
-                    completed.push(this.features[f].completed)
-                } else {
-                    const { Aggregate } = await import(`../../features/${f.replace(/_/g, '-')}/aggregate`)
-                    this.features[f] = new Aggregate(this.agentIdentifier, this.sharedAggregator)
+                    if (isAuto(f, this.agentIdentifier)) {
+                        const { Instrument } = await import(`../../features/${f.replace(/_/g, '-')}/instrument`)
+                        this.features[f] = new Instrument(this.agentIdentifier, this.sharedAggregator)
+                        completed.push(this.features[f].completed)
+                    } else {
+                        const { Aggregate } = await import(`../../features/${f.replace(/_/g, '-')}/aggregate`)
+                        this.features[f] = new Aggregate(this.agentIdentifier, this.sharedAggregator)
+                    }
                 }
-            }
-        }))
-        await Promise.all(completed)
-        drainAll(this.agentIdentifier)
-        gosNREUMInitializedAgents(this.agentIdentifier, this.features, 'features')
-        return true
+            }))
+            await Promise.all(completed)
+            drainAll(this.agentIdentifier)
+            gosNREUMInitializedAgents(this.agentIdentifier, this.features, 'features')
+            return true
+        } catch (err) {
+            console.error(err)
+            return false
+        }
     }
 }
 
