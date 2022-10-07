@@ -143,7 +143,6 @@ export class Aggregate extends AggregateBase {
   }
 
   storeError(err, time, internal, customAttributes) {
-    console.log("storeError...")
     // are we in an interaction
     time = time || now()
     if (!internal && getRuntime(this.agentIdentifier).onerror && getRuntime(this.agentIdentifier).onerror(err)) return

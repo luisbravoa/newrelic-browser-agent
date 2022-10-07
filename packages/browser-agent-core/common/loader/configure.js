@@ -1,4 +1,4 @@
-import { addToNREUM, gosCDN, gosNREUMInitializedAgents } from '../window/nreum'
+import { addToNREUM, gosNREUMInitializedAgents } from '../window/nreum'
 import { setConfiguration, setInfo, setLoaderConfig, setRuntime } from '../config/config'
 import { setAPI } from '../api/api'
 import { activateFeatures } from '../util/feature-flags'
