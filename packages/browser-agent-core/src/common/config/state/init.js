@@ -14,6 +14,7 @@ const model = {
   },
   ssl: undefined,
   obfuscate: undefined,
+  pageId: undefined,
   jserrors: {enabled: true},
   metrics: {enabled: true},
   page_action: {enabled: true},

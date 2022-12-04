@@ -12,8 +12,9 @@ export function configure() {
     if (configured) return
     const nr = gosCDN()
 
+    nr.info.jsAttributes = {...nr.info.jsAttributes, pageId: nr.init?.pageId || agentIdentifier}
     if (isWebWorker) {  // add a default attr to all worker payloads
-        nr.info.jsAttributes = {...nr.info.jsAttributes, isWorker: true};
+        nr.info.jsAttributes.isWorker = true
     }
 
     try {

@@ -14,6 +14,7 @@ export function aggregator(build) {
     // do this again in case they are using a custom build that has
     // nr.info below the main agent script in some way
     const nr = gosCDN()
+    nr.info.jsAttributes = {...nr.info.jsAttributes, pageId: nr.init?.pageId || agentIdentifier}
     setInfo(agentIdentifier, nr.info)
   }
 
