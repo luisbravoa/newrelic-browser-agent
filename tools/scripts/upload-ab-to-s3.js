@@ -41,6 +41,11 @@ let counter = 1
 
 if (!env || !appId || !licenseKey || !bucket || !role) {
   console.log("missing required param")
+  if (!env) console.log("env")
+  if (!appId) console.log("appId")
+  if (!licenseKey) console.log("licenseKey")
+  if (!bucket) console.log("bucket")
+  if (!role) console.log("role")
   process.exit(1)
 }
 
@@ -97,7 +102,7 @@ function getIdFromUrl(url) {
     console.log(`found ${contents.length} valid PR builds in CDN`)
     let output = `window.NREUM=${JSON.stringify(config)};`
     output += `
-      const ids = {};
+      const nrbaIds = {};
     `
     contents.forEach(([url, res, body]) => { output += wrapAgent(body, getIdFromUrl(url)) })
     output += randomExecutor(contents.map(([url]) => getIdFromUrl(url)))
@@ -109,7 +114,7 @@ function getIdFromUrl(url) {
       expires.setMonth(expires.getMonth() + 1)
 
       const uploads = await uploadToS3(filename, output, bucket, dry, 300, expires.toISOString())
-      console.log(`Successfully uploaded ${filename} to S3`)
+      console.log(`Successfully uploaded ${filename } to S3`)
       process.exit(0)
     }).catch(err => {
       console.log(err)
@@ -123,7 +128,8 @@ function getIdFromUrl(url) {
 
 function wrapAgent(agent, id) {
   return `
-        ids['${id}'] = () => {
+        nrbaIds['${id}'] = (initOverride) => {
+          if (initOverride) NREUM.init = {...NREUM.init, ...initOverride};
             ${agent}
             newrelic.setCustomAttribute('buildID', '${id}')
         }
@@ -133,13 +139,11 @@ function wrapAgent(agent, id) {
 function randomExecutor(ids) {
   let output = `
         (function (){
-          const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-          });
-          if (params.nrbaloader && ids[params.nrbaloader]) return ids[params.nrbaloader]();
+          const loaderId = localStorage.getItem("nrbaloader")
+          let customInit = localStorage.getItem("nrbainit")
 
-          const ls = localStorage.getItem("nrbaloader")
-          if (ls && ids[ls]) return ids[ls]();
+          if (customInit) customInit = JSON.parse(customInit)
+          if (loaderId && nrbaIds[loaderId]) return nrbaIds[loaderId](customInit);
           
           var r = Math.random();
     `
