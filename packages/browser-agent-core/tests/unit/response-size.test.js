@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import test from '../../../tools/jil/browser-test'
-import { responseSizeFromXhr } from '../../../packages/browser-agent-core/features/ajax/instrument/response-size'
+import t from '../utils/JILtoJest'
+import { responseSizeFromXhr } from '../../features/ajax/instrument/response-size'
 
-test('ms-stream has undefined size', function(t) {
+test('ms-stream has undefined size', function(done) {
   var xhrRequest = {
     responseType: 'ms-stream',
     response: '12345',
@@ -15,13 +15,13 @@ test('ms-stream has undefined size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, 0)
   t.ok(ret === undefined, 'returned size should be undefined')
-  t.end()
+  done()
 })
 
-test('arraybuffer returns response size', function(t) {
+test('arraybuffer returns response size', function(done) {
   if (typeof ArrayBuffer !== 'function') {
     t.comment('ArrayBuffer constructor is not supported in this browser, skipping')
-    t.end()
+    done()
     return
   }
 
@@ -34,13 +34,13 @@ test('arraybuffer returns response size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, 0)
   t.ok(ret === obj.byteLength, 'returned size should be arraybuffer size')
-  t.end()
+  done()
 })
 
-test('blob returns response size', function(t) {
+test('blob returns response size', function(done) {
   if (typeof Blob !== 'function') {
     t.comment('Blob constructor is not supported in this browser, skipping')
-    t.end()
+    done()
     return
   }
 
@@ -55,10 +55,10 @@ test('blob returns response size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, 0)
   t.ok(ret === blob.size, 'returned size should be blob size')
-  t.end()
+  done()
 })
 
-test('json returns response size', function(t) {
+test('json returns response size', function(done) {
   var obj = JSON.parse('{"hello": "world"}')
 
   var xhrRequest = {
@@ -69,10 +69,10 @@ test('json returns response size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, null)
   t.ok(ret === JSON.stringify(obj).length, 'returned size should be json size')
-  t.end()
+  done()
 })
 
-test('text returns responseText size', function(t) {
+test('text returns responseText size', function(done) {
   var text = 'responseText'
 
   var xhrRequest = {
@@ -83,10 +83,10 @@ test('text returns responseText size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, null)
   t.ok(ret === text.length, 'returned size should be text size')
-  t.end()
+  done()
 })
 
-test('default empty string type returns responseText size', function(t) {
+test('default empty string type returns responseText size', function(done) {
   var text = 'responseText'
 
   var xhrRequest = {
@@ -97,5 +97,5 @@ test('default empty string type returns responseText size', function(t) {
 
   var ret = responseSizeFromXhr(xhrRequest, null)
   t.ok(ret === text.length, 'returned size should be text size')
-  t.end()
+  done()
 })

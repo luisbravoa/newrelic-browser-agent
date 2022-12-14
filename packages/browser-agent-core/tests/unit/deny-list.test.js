@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import test from '../../../tools/jil/browser-test'
-import { parseUrl } from '../../../packages/browser-agent-core/common/url/parse-url'
-import { setDenyList, shouldCollectEvent } from '../../../packages/browser-agent-core/common/deny-list/deny-list'
+import t from '../utils/JILtoJest'
+import { parseUrl } from '../../common/url/parse-url'
+import { setDenyList, shouldCollectEvent } from '../../common/deny-list/deny-list'
 
 /* NOTE: This file contains pure unit tests that has no need for the agent at all.
 */
-
-test('domain-only blocks all subdomains and all paths', function(t) {
+test('domain-only blocks all subdomains and all paths', function (done) {
   setDenyList([
     'foo.com'
   ])
@@ -28,10 +27,10 @@ test('domain-only blocks all subdomains and all paths', function(t) {
   // other domains are allowed
   t.equals(shouldCollectEvent(parseUrl('http://bar.com')), true)
 
-  t.end()
+  done()
 })
 
-test('subdomain blocks further subdomains, but not parent domain', function(t) {
+test('subdomain blocks further subdomains, but not parent domain', function (done) {
   setDenyList([
     'bar.foo.com'
   ])
@@ -44,10 +43,10 @@ test('subdomain blocks further subdomains, but not parent domain', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://foo.com')), true)
   t.equals(shouldCollectEvent(parseUrl('http://bar.com')), true)
 
-  t.end()
+  done()
 })
 
-test('* blocks all domains', function(t) {
+test('* blocks all domains', function (done) {
   setDenyList([
     '*'
   ])
@@ -58,10 +57,10 @@ test('* blocks all domains', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://a.foo.com')), false)
   t.equals(shouldCollectEvent(parseUrl('http://a.bar.com')), false)
 
-  t.end()
+  done()
 })
 
-test('path is blocking only with exact match', function(t) {
+test('path is blocking only with exact match', function (done) {
   setDenyList([
     'foo.com/a'
   ])
@@ -77,10 +76,10 @@ test('path is blocking only with exact match', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://foo.com/a/b')), false)
   t.equals(shouldCollectEvent(parseUrl('http://foo.com/a')), true)
 
-  t.end()
+  done()
 })
 
-test('* blocks all domains', function(t) {
+test('* blocks all domains', function (done) {
   setDenyList([
     '*'
   ])
@@ -91,10 +90,10 @@ test('* blocks all domains', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://a.foo.com')), false)
   t.equals(shouldCollectEvent(parseUrl('http://a.bar.com')), false)
 
-  t.end()
+  done()
 })
 
-test('protocol is ignored when not specified', function(t) {
+test('protocol is ignored when not specified', function (done) {
   setDenyList([
     'foo.com'
   ])
@@ -102,10 +101,10 @@ test('protocol is ignored when not specified', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://foo.com')), false)
   t.equals(shouldCollectEvent(parseUrl('https://foo.com')), false)
 
-  t.end()
+  done()
 })
 
-test('port is ignored when not specified', function(t) {
+test('port is ignored when not specified', function (done) {
   setDenyList([
     'foo.com'
   ])
@@ -113,11 +112,11 @@ test('port is ignored when not specified', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://foo.com:8080')), false)
   t.equals(shouldCollectEvent(parseUrl('http://foo.com:8181')), false)
 
-  t.end()
+  done()
 })
 
 // test unexpected strings that don't represent URLs
-test('invalid values', function(t) {
+test('invalid values', function (done) {
   setDenyList([
     '!@$%^*'
   ])
@@ -131,10 +130,10 @@ test('invalid values', function(t) {
   t.equals(shouldCollectEvent(parseUrl('http://foo.com')), false)
   t.equals(shouldCollectEvent(parseUrl('http://bar.com')), true)
 
-  t.end()
+  done()
 })
 
-test('URL that contains protocol multiple times', function(t) {
+test('URL that contains protocol multiple times', function (done) {
   setDenyList([
     'https://example.com/http://foo.bar/'
   ])
@@ -148,5 +147,5 @@ test('URL that contains protocol multiple times', function(t) {
 
   t.equals(shouldCollectEvent(parseUrl('https://example.com/http://foo.bar/')), false)
 
-  t.end()
+  done()
 })

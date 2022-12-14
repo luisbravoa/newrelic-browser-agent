@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import test from '../../../tools/jil/browser-test'
 import { setup } from '../utils/setup'
-import { DT } from '../../../packages/browser-agent-core/features/ajax/instrument/distributed-tracing'
-import { setLoaderConfig, getLoaderConfig, setConfiguration } from '../../../packages/browser-agent-core/common/config/config'
+import { DT } from '../../features/ajax/instrument/distributed-tracing'
+import { setLoaderConfig, getLoaderConfig, setConfiguration } from '../../common/config/config'
+import t from '../utils/JILtoJest'
 
 const { agentIdentifier } = setup();
 const distributedTracing = new DT(agentIdentifier);
@@ -19,10 +19,10 @@ var parsedOrigin = {
   sameOrigin: true
 }
 
-test('newrelic header has the correct format', function (t) {
+test('newrelic header has the correct format', function (done) {
   if (!supportsBase64) {
     t.skip('atob function is required for this test')
-    t.end()
+    done()
     return
   }
 
@@ -54,10 +54,10 @@ test('newrelic header has the correct format', function (t) {
   t.equal(header.d.ac, loadercfg.accountID, 'ac in header is set to account')
   t.equal(header.d.ap, loadercfg.agentID, 'ap in header is set to app/agent ID')
   t.equal(header.d.tk, loadercfg.trustKey, 'tk in header is set to trust key')
-  t.end()
+  done()
 })
 
-test('newrelic header is not generated for same-origin calls when disabled in configuration', function (t) {
+test('newrelic header is not generated for same-origin calls when disabled in configuration', function (done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -74,13 +74,13 @@ test('newrelic header is not generated for same-origin calls when disabled in co
   t.ok(payload.newrelicHeader == null, 'newrelicHeader should not be generated')
   t.ok(payload.traceContextParentHeader != null, 'traceparent header should be generated')
   t.ok(payload.traceContextStateHeader != null, 'tracestate header should be generated')
-  t.end()
+  done()
 })
 
-test('newrelic header is added to cross-origin calls by default', function(t) {
+test('newrelic header is added to cross-origin calls by default', function(done) {
   if (!supportsBase64) {
     t.skip('atob function is required for this test')
-    t.end()
+    done()
     return
   }
 
@@ -108,13 +108,13 @@ test('newrelic header is added to cross-origin calls by default', function(t) {
 
   t.ok(header != null, 'newrelic header should be generated')
 
-  t.end()
+  done()
 })
 
-test('newrelic header is added to cross-origin calls when enabled in configuration', function(t) {
+test('newrelic header is added to cross-origin calls when enabled in configuration', function(done) {
   if (!supportsBase64) {
     t.skip('atob function is required for this test')
-    t.end()
+    done()
     return
   }
 
@@ -143,10 +143,10 @@ test('newrelic header is added to cross-origin calls when enabled in configurati
 
   t.ok(header != null, 'newrelic header should be generated')
 
-  t.end()
+  done()
 })
 
-test('newrelic header is not added to cross-origin calls when disabled in configuration', function(t) {
+test('newrelic header is not added to cross-origin calls when disabled in configuration', function(done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -172,10 +172,10 @@ test('newrelic header is not added to cross-origin calls when disabled in config
 
   t.ok(header == null, 'newrelic header should be empty')
 
-  t.end()
+  done()
 })
 
-test('TraceContext headers are generated with the correct format', function (t) {
+test('TraceContext headers are generated with the correct format', function (done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -214,10 +214,10 @@ test('TraceContext headers are generated with the correct format', function (t) 
   t.equal(parts[7], '', 'priority is not set')
   t.equal(parts[8], payload.timestamp.toString(), 'last part is set to timestamp')
 
-  t.end()
+  done()
 })
 
-test('TraceContext headers are not added to cross-origin calls by default', function(t) {
+test('TraceContext headers are not added to cross-origin calls by default', function(done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -244,10 +244,10 @@ test('TraceContext headers are not added to cross-origin calls by default', func
   t.ok(parentHeader == null, 'traceparent header should be empty')
   t.ok(stateHeader == null, 'tracestate header should be empty')
 
-  t.end()
+  done()
 })
 
-test('TraceContext headers are added to cross-origin calls when enabled in configuration', function(t) {
+test('TraceContext headers are added to cross-origin calls when enabled in configuration', function(done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -275,10 +275,10 @@ test('TraceContext headers are added to cross-origin calls when enabled in confi
   t.ok(parentHeader != null, 'traceparent header should be generated')
   t.ok(stateHeader != null, 'tracestate header should be generated')
 
-  t.end()
+  done()
 })
 
-test('TraceContext headers are not added to cross-origin calls when disabled in configuration', function(t) {
+test('TraceContext headers are not added to cross-origin calls when disabled in configuration', function(done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: '5678',
@@ -306,14 +306,14 @@ test('TraceContext headers are not added to cross-origin calls when disabled in 
   t.ok(parentHeader == null, 'traceparent header should be empty')
   t.ok(stateHeader == null, 'tracestate header should be empty')
 
-  t.end()
+  done()
 })
 
 // regression test
-test('newrelic header is generated when configuration has numeric values', function (t) {
+test('newrelic header is generated when configuration has numeric values', function (done) {
   if (!supportsBase64) {
     t.skip('atob function is required for this test')
-    t.end()
+    done()
     return
   }
 
@@ -347,10 +347,10 @@ test('newrelic header is generated when configuration has numeric values', funct
   t.ok(header.d.id)
   t.ok(header.d.tr)
   t.ok(header.d.ti)
-  t.end()
+  done()
 })
 
-test('NREUM.loader_config object is empty - no DT headers are generated', function (t) {
+test('NREUM.loader_config object is empty - no DT headers are generated', function (done) {
   setLoaderConfig(agentIdentifier, {});
   setConfiguration(agentIdentifier, {
     distributed_tracing: {
@@ -361,10 +361,10 @@ test('NREUM.loader_config object is empty - no DT headers are generated', functi
   var payload = generateTracePayload(parsedOrigin)
 
   t.notOk(payload, 'payload is null')
-  t.end()
+  done()
 })
 
-test('accountID is missing - no header generated', function (t) {
+test('accountID is missing - no header generated', function (done) {
   setLoaderConfig(agentIdentifier, {
     accountID: null,
     agentID: '5678',
@@ -379,10 +379,10 @@ test('accountID is missing - no header generated', function (t) {
   var payload = generateTracePayload(parsedOrigin)
 
   t.notOk(payload, 'payload is null')
-  t.end()
+  done()
 })
 
-test('agentID is missing - no header generated', function (t) {
+test('agentID is missing - no header generated', function (done) {
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
     agentID: null,
@@ -397,13 +397,13 @@ test('agentID is missing - no header generated', function (t) {
   var payload = generateTracePayload(parsedOrigin)
 
   t.notOk(payload, 'payload is null')
-  t.end()
+  done()
 })
 
-test('trustKey is missing - header generated, trustKey won\'t be in header', function (t) {
+test('trustKey is missing - header generated, trustKey won\'t be in header', function (done) {
   if (!supportsBase64) {
     t.skip('atob function is required for this test')
-    t.end()
+    done()
     return
   }
 
@@ -438,10 +438,10 @@ test('trustKey is missing - header generated, trustKey won\'t be in header', fun
   t.ok(header.d.id)
   t.ok(header.d.tr)
   t.ok(header.d.ti)
-  t.end()
+  done()
 })
 
-test('window.btoa is missing - no header generated', function (t) {
+test('window.btoa is missing - no header generated', function (done) {
   /* eslint-disable no-native-reassign */
   setLoaderConfig(agentIdentifier, {
     accountID: '1234',
@@ -467,20 +467,20 @@ test('window.btoa is missing - no header generated', function (t) {
   t.notOk(payload.header)
 
   window.btoa = originalBtoa
-  t.end()
+  done()
   /* eslint-enable */
 })
 
-test('NREUM.init object has no DT section - shouldGenerateTrace is false', function (t) {
+test('NREUM.init object has no DT section - shouldGenerateTrace is false', function (done) {
   setConfiguration(agentIdentifier, {});
 
   var result = shouldGenerateTrace(parsedOrigin)
 
   t.equal(result, false)
-  t.end()
+  done()
 })
 
-test('NREUM.loader_config object has dt enabled/same origin - shouldGenerateTrace is true', function (t) {
+test('NREUM.loader_config object has dt enabled/same origin - shouldGenerateTrace is true', function (done) {
   setConfiguration(agentIdentifier, {
     distributed_tracing: {
       enabled: true
@@ -490,10 +490,10 @@ test('NREUM.loader_config object has dt enabled/same origin - shouldGenerateTrac
   var result = shouldGenerateTrace(parsedOrigin)
 
   t.equal(result, true)
-  t.end()
+  done()
 })
 
-test('NREUM.loader_config object has dt enabled/allowed CORS origin - shouldGenerateTrace is true', function (t) {
+test('NREUM.loader_config object has dt enabled/allowed CORS origin - shouldGenerateTrace is true', function (done) {
   setConfiguration(agentIdentifier, {
     distributed_tracing: {
       enabled: true,
@@ -510,10 +510,10 @@ test('NREUM.loader_config object has dt enabled/allowed CORS origin - shouldGene
   var result = shouldGenerateTrace(otherParsedOrigin)
 
   t.equal(result, true)
-  t.end()
+  done()
 })
 
-test('NREUM.loader_config object has dt enabled/disallowed CORS origin - shouldGenerateTrace is false', function (t) {
+test('NREUM.loader_config object has dt enabled/disallowed CORS origin - shouldGenerateTrace is false', function (done) {
   setConfiguration(agentIdentifier, {
     distributed_tracing: {
       enabled: true,
@@ -530,5 +530,5 @@ test('NREUM.loader_config object has dt enabled/disallowed CORS origin - shouldG
   var result = shouldGenerateTrace(otherParsedOrigin)
 
   t.equal(result, false)
-  t.end()
+  done()
 })

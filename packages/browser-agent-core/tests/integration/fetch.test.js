@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import test from '../../../tools/jil/browser-test.js'
 import { setup } from '../utils/setup'
-import { Instrument as AjaxInstrum } from '../../../packages/browser-agent-core/features/ajax/instrument/index.js'
+import { Instrument as AjaxInstrum } from '../../features/ajax/instrument/index.js'
+import t from '../utils/JILtoJest'
 
 const { baseEE, agentIdentifier, nr } = setup();
 const ajaxTestInstr = new AjaxInstrum(agentIdentifier); // attach instrumentation event handlers to agent's events (baseEE)
@@ -91,10 +91,10 @@ if (!NREUM.loader_config) NREUM.loader_config = {}
 */
 
 testCases.forEach(function(testCase) {
-  test(testCase.name, function(t) {
+  test(testCase.name, function(done) {
     if (!window.fetch) {
       t.pass('fetch is not supported in this browser')
-      t.end()
+      done()
       return
     }
 
@@ -103,7 +103,7 @@ testCases.forEach(function(testCase) {
 
     function validate(params, metrics, start) {
       testCase.check(t, params, metrics, start)
-      t.end()
+      done()
       baseEE.removeEventListener('xhr', validate)
     }
   })
@@ -112,10 +112,10 @@ testCases.forEach(function(testCase) {
 // fetch rejects only if there is a network error; this is possible to simulate by closing
 // the connection in the server, but it does not work when there is a proxy in between (like Saucelabs).
 // This tests therefore simulates failed fetch call by emitting the instrumentation events instead.
-test('rejected fetch call is captured', function(t) {
+test('rejected fetch call is captured', function(done) {
   if (!window.fetch) {
     t.pass('fetch is not supported in this browser')
-    t.end()
+    done()
     return
   }
 
@@ -142,6 +142,6 @@ test('rejected fetch call is captured', function(t) {
     t.ok(start > 0, 'start is a positive number')
 
     baseEE.removeEventListener('xhr', validate)
-    t.end()
+    done()
   }
 })
