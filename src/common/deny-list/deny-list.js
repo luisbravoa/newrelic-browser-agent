@@ -47,7 +47,7 @@ export function setDenyList (denyListConfig) {
   }
 
   for (var i = 0; i < denyListConfig.length; i++) {
-    var url = denyListConfig[i]
+    var url = denyListConfig[i].trim()
 
     if (url.indexOf('http://') === 0) {
       url = url.substring(7)
@@ -106,6 +106,14 @@ function comparePath (pattern, path) {
   // No path in pattern means match all paths.
   if (pattern === '') {
     return true
+  }
+
+  /// pattern.endsWith('/*')
+
+  if (pattern.indexOf('/*/') > -1) {
+    const blobSegmentIndex = pattern.indexOf('/*/')
+    return path.substring(0, blobSegmentIndex) === pattern.substring(0, blobSegmentIndex) &&
+      path.substring(blobSegmentIndex + 3) === pattern.substring(blobSegmentIndex + 3)
   }
 
   if (pattern === path) {

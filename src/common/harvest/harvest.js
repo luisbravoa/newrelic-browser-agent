@@ -97,8 +97,8 @@ export class Harvest extends SharedContext {
 
     if (!opts) opts = {}
 
-    // var url = this.getScheme() + '://' + info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + this.baseQueryString()
-    var url = info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + this.baseQueryString()
+    var url = this.getScheme() + '://' + info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + this.baseQueryString()
+    // var url = info.errorBeacon + '/' + endpoint + '/1/' + info.licenseKey + this.baseQueryString()
     if (payload.qs) url += encodeObj(payload.qs, agentRuntime.maxBytes)
 
     if (!submitMethod) {
