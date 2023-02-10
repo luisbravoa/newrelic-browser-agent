@@ -61,7 +61,7 @@ class BaseServer {
 
   start (port = null, sslPort = null, done) {
     if (port >= 0) {
-      this.server.listen(port)
+      this.server.listen(port, '0.0.0.0')
     }
     if (sslPort >= 0) {
       this.sslPort = sslPort

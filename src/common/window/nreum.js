@@ -3,6 +3,7 @@ import { now } from '../timing/now'
 import { globalScope } from '../util/global-scope'
 
 export const defaults = {
+  assets: 'js-agent.newrelic.com',
   beacon: 'bam.nr-data.net',
   errorBeacon: 'bam.nr-data.net'
 }
@@ -20,6 +21,7 @@ export function gosNREUMInfo () {
   const externallySupplied = nr.info || {}
 
   nr.info = {
+    assets: defaults.assets,
     beacon: defaults.beacon,
     errorBeacon: defaults.errorBeacon,
     ...externallySupplied

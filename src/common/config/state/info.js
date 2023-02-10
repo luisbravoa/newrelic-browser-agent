@@ -3,6 +3,7 @@ import { Configurable } from './configurable'
 
 const model = {
   // preset defaults
+  assets: nrDefaults.assets,
   beacon: nrDefaults.beacon,
   errorBeacon: nrDefaults.errorBeacon,
   // others must be populated by user

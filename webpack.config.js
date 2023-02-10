@@ -121,7 +121,7 @@ const commonConfig = {
     filename: '[name].js',
     chunkFilename: SUBVERSION === 'PROD' ? `[name].[chunkhash:8]${PATH_VERSION}.min.js` : `[name]${PATH_VERSION}.js`,
     path: path.resolve(__dirname, './build'),
-    publicPath: PUBLIC_PATH, // CDN route vs local route (for linking chunked assets)
+    // publicPath: PUBLIC_PATH, // CDN route vs local route (for linking chunked assets)
     clean: false
   },
   plugins: [
@@ -129,6 +129,7 @@ const commonConfig = {
       // 'WEBPACK_MINOR_VERSION': JSON.stringify(SUBVERSION || ''),
       // 'WEBPACK_MAJOR_VERSION': JSON.stringify(VERSION || ''),
       'process.env.BUILD_VERSION': `${VERSION}.${SUBVERSION}`,
+      'process.env.ASSET_PATH': JSON.stringify(PUBLIC_PATH),
       WEBPACK_DEBUG: JSON.stringify(IS_LOCAL || false)
     })
   ]

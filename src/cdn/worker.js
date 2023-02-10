@@ -1,3 +1,4 @@
+import './public-path'
 import { Agent } from '../loaders/agent'
 
 import { Instrument as InstrumentMetrics } from '../features/metrics/instrument'

@@ -1,3 +1,4 @@
+import './public-path'
 import { Agent } from '../loaders/agent'
 
 import { Instrument as InstrumentPageViewEvent } from '../features/page_view_event/instrument'
