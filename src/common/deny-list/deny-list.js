@@ -2,44 +2,14 @@
  * @see {@link https://docs.newrelic.com/docs/browser/new-relic-browser/configuration/filter-ajax-request-events/ Filter AjaxRequest events}
  * @type {Array.<{hostname: string, pathname: string}>}
  */
-var denyList = []
-
-/**
- * Evaluates whether an XHR event should be included for collection based on the {@link denyList|AjaxRequest deny list}.
- * @param {Object} params - object with properties of the XHR event
- * @returns {boolean} `true` if request does not match any entries of {@link denyList|deny list}; else `false`
- */
-export function shouldCollectEvent (params) {
-  if (denyList.length === 0) {
-    return true
-  }
-
-  // XHR requests with an undefined hostname (e.g., data URLs) should not be collected.
-  if (params.hostname === undefined) {
-    return false
-  }
-
-  for (var i = 0; i < denyList.length; i++) {
-    var parsed = denyList[i]
-
-    if (parsed.hostname === '*') {
-      return false
-    }
-
-    if (domainMatchesPattern(parsed.hostname, params.hostname) &&
-      comparePath(parsed.pathname, params.pathname)) {
-      return false
-    }
-  }
-
-  return true
-}
+export var denyList = []
 
 /**
  * Initializes the {@link denyList|XHR deny list} by extracting hostname and pathname from an array of filter strings.
- * @param {string[]} denyListConfig - array of URL filters to identify XHR requests to be excluded from collection
+ * Strips `http://` or `https://` prefixes from start of URL patterns.
+ * @param {string[]} denyListConfig - Array of URL filters to identify XHR requests to be excluded from collection.
  */
-export function setDenyList (denyListConfig) {
+export function populateDenyList (denyListConfig) {
   denyList = []
 
   if (!denyListConfig || !denyListConfig.length) {
@@ -70,18 +40,50 @@ export function setDenyList (denyListConfig) {
     }
   }
 }
+
 /**
- * Returns true if the right side of `domain` (end of string) matches `pattern`.
- * @param {string} pattern - a string to be matched against the end of `domain` string
- * @param {string} domain - a domain string with no protocol or path (e.g., app1.example.com)
- * @returns {boolean} `true` if domain matches pattern; else `false`
+ * Evaluates whether an XHR event should be included for collection based on the {@link denyList|AjaxRequest deny list}.
+ * @param {Object} xhrParams - object with properties of the XHR event
+ * @returns {boolean} `true` if request does not match any entries of {@link denyList|deny list}; else `false`
  */
-function domainMatchesPattern (pattern, domain) {
-  if (pattern.length > domain.length) {
+export function shouldCollectXhrEvent (xhrParams) {
+  if (denyList.length === 0) {
+    return true
+  }
+
+  // XHR requests with an undefined hostname (e.g., data URLs) should not be collected.
+  if (xhrParams.hostname === undefined) {
     return false
   }
 
-  if (domain.indexOf(pattern) === (domain.length - pattern.length)) {
+  for (var i = 0; i < denyList.length; i++) {
+    var denyListEntry = denyList[i]
+
+    if (hostnameMatchesPattern(xhrParams.hostname, denyListEntry.hostname) &&
+      pathMatchesPattern(xhrParams.pathname, denyListEntry.pathname)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
+ * Returns true if the end of the `hostname` string matches `pattern` or if `pattern` is `*` (a wildcard).
+ * @param {string} hostname - A domain string with no protocol or path (e.g., app1.example.com).
+ * @param {string} pattern - A string to be matched against the end of `hostname` string or an asterisk.
+ * @returns {boolean} `true` if hostname matches pattern; else `false`.
+ */
+export function hostnameMatchesPattern (hostname, pattern) {
+  if (pattern.length > hostname.length) {
+    return false
+  }
+
+  if (pattern === '*') {
+    return true
+  }
+
+  if (hostname.indexOf(pattern) === (hostname.length - pattern.length)) {
     return true
   }
 
@@ -89,36 +91,38 @@ function domainMatchesPattern (pattern, domain) {
 }
 
 /**
- * Returns true if a URL path matches a pattern string, disregarding leading slashes.
- * @param {string} pattern - a string to compare with path (e.g., api/v1)
- * @param {string} path - a string representing a URL path (e.g., /api/v1)
- * @returns {boolean} `true` if path and pattern are an exact string match (except for leading slashes); else `false`
- */
-function comparePath (pattern, path) {
-  if (pattern.indexOf('/') === 0) {
-    pattern = pattern.substring(1)
+ * Determines whether a given URL path matches a given pattern. An asterisk pattern segment (`/*`) will be treated as a
+ * wildcard matching one or more whole path segments.
+ * @param {string} path - The path to match.
+ * @param {string} pattern - The pattern to match against.
+ * @returns {boolean} Returns true if the path matches the pattern, and false otherwise.
+*/
+export function pathMatchesPattern (path, pattern) {
+  // An empty pattern matches all paths.
+  if (pattern.trim() === '') return true
+
+  path = path
+    .replace(/\/+$/, '') // Remove trailing slashes.
+    .replace(/^\/?/, '/') // Ensure there's a leading slash.
+
+  pattern = pattern
+    .replace(/\/+$/, '') // Remove trailing slashes.
+    .replace(/^\/?/, '/') // Ensure there's a leading slash.
+    .replaceAll(/\*+/g, '*') // Replace multiple asterisks with a single asterisk.
+    .replaceAll(/(\/\*)+/g, '/*') // Replace multiple sequential wildcard segments with just one.
+
+  // Abort if the pattern includes characters that could conflict with RegExp.
+  if (pattern.match(/[^A-Za-z0-9-_/*]/g)) return false
+
+  try {
+    return path.match(new RegExp(
+      '^' + // Ensure the match starts at the beginning of the path.
+      pattern
+        .replaceAll('/', '\\/') // Escape slashes for regular expression compatibility.
+        .replaceAll('\\/*', '(\\/.+)') + // Convert /* to regular expression syntax.
+      '$' // Ensure the match includes the end of the path.
+    )) !== null
+  } catch (e) {
+    return false
   }
-
-  if (path.indexOf('/') === 0) {
-    path = path.substring(1)
-  }
-
-  // No path in pattern means match all paths.
-  if (pattern === '') {
-    return true
-  }
-
-  /// pattern.endsWith('/*')
-
-  if (pattern.indexOf('/*/') > -1) {
-    const blobSegmentIndex = pattern.indexOf('/*/')
-    return path.substring(0, blobSegmentIndex) === pattern.substring(0, blobSegmentIndex) &&
-      path.substring(blobSegmentIndex + 3) === pattern.substring(blobSegmentIndex + 3)
-  }
-
-  if (pattern === path) {
-    return true
-  }
-
-  return false
 }

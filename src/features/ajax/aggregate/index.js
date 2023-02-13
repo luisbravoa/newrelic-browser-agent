@@ -8,7 +8,7 @@ import { nullable, numeric, getAddStringContext, addCustomAttributes } from '../
 import { handle } from '../../../common/event-emitter/handle'
 import { getConfigurationValue, getInfo } from '../../../common/config/config'
 import { HarvestScheduler } from '../../../common/harvest/harvest-scheduler'
-import { setDenyList, shouldCollectEvent } from '../../../common/deny-list/deny-list'
+import { populateDenyList, shouldCollectXhrEvent } from '../../../common/deny-list/deny-list'
 import { AggregateBase } from '../../utils/aggregate-base'
 import { FEATURE_NAME } from '../constants'
 import { drain } from '../../../common/drain/drain'
@@ -49,7 +49,7 @@ export class Aggregate extends AggregateBase {
       delete spaAjaxEvents[interaction.id]
     })
 
-    if (allAjaxIsEnabled()) setDenyList(getConfigurationValue(agentIdentifier, 'ajax.deny_list'))
+    if (allAjaxIsEnabled()) populateDenyList(getConfigurationValue(agentIdentifier, 'ajax.deny_list'))
 
     register('xhr', storeXhr, this.featureName, this.ee)
 
@@ -75,7 +75,7 @@ export class Aggregate extends AggregateBase {
 
       handle('bstXhrAgg', ['xhr', hash, params, metrics], undefined, FEATURE_NAMES.sessionTrace, ee)
 
-      if (!shouldCollectEvent(params)) {
+      if (!shouldCollectXhrEvent(params)) {
         if (params.hostname === getInfo(agentIdentifier).errorBeacon) {
           handle('record-supportability', ['Ajax/Events/Excluded/Agent'], undefined, FEATURE_NAMES.metrics, ee)
         } else {

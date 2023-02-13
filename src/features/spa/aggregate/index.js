@@ -5,7 +5,7 @@
 /*eslint no-undef: "error"*/
 import { registerHandler as register } from '../../../common/event-emitter/register-handler'
 import { parseUrl } from '../../../common/url/parse-url'
-import { shouldCollectEvent } from '../../../common/deny-list/deny-list'
+import { shouldCollectXhrEvent } from '../../../common/deny-list/deny-list'
 import { mapOwn } from '../../../common/util/map-own'
 import { navTimingValues as navTiming } from '../../../common/timing/nav-timing'
 import { generateUuid } from '../../../common/ids/unique-id'
@@ -308,7 +308,7 @@ export class Aggregate extends AggregateBase {
     register('xhr-resolved', function () {
       var node = this[SPA_NODE]
       if (node) {
-        if (!shouldCollectEvent(this.params)) {
+        if (!shouldCollectXhrEvent(this.params)) {
           node.cancel()
           return
         }
