@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/newrelic/newrelic-browser-agent/issues"
   },
-  "homepage": "https://github.com/newrelic/newrelic-browser-agent#readme"
+  "homepage": "https://github.com/newrelic/newrelic-browser-agent#readme",
+  "devDependencies": {
+    "yargs": "^17.7.1"
+  }
 }
