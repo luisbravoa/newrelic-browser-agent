@@ -1,7 +1,28 @@
-var argv = require('yargs')
+const fs = require('fs')
+const path = require('path')
+const argv = require('yargs')
   .usage('$0 [options]')
 
-  .string('v')
-  .describe('v', 'The v')
+  .string('p')
+  .alias('p', 'pr')
+  .describe('p', 'The identifier of the PR, used to name the file')
 
-const { env, appId, licenseKey, bucket, role, current, next, dry, sha, workflow } = argv
+  .string('h')
+  .alias('h', 'heading')
+  .describe('h', 'The heading of the changelog item (###)')
+
+  .string('d')
+  .alias('d', 'description')
+  .describe('d', 'The description body of the changelog item')
+  .argv
+
+const { pr, heading, description } = argv
+const nextDir = path.join(__dirname, '../src/next')
+if (!fs.existsSync(nextDir)) {
+  fs.mkdirSync(nextDir)
+}
+
+const fileContents = `### ${heading}
+${description}`
+
+fs.writeFileSync(`${nextDir}/${pr}.md`, fileContents, 'utf-8')
