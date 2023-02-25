@@ -7,13 +7,9 @@ const argv = require('yargs')
   .alias('p', 'pr')
   .describe('p', 'The PR number')
 
-  .string('h')
-  .alias('h', 'heading')
-  .describe('h', 'The heading of the changelog item (###)')
-
-  .string('d')
-  .alias('d', 'description')
-  .describe('d', 'The description body of the changelog item')
+  .string('c')
+  .alias('c', 'comment')
+  .describe('h', 'The PR comment, extended descriptions are used to fill the body of the changelog item if present')
 
   .array('l')
   .alias('l', 'links')
@@ -21,18 +17,19 @@ const argv = require('yargs')
 
   .argv
 
-const { pr, heading, description, links } = argv
+const { pr, comment, links } = argv
 const nextDir = path.join(__dirname, '../src/next')
 if (!fs.existsSync(nextDir)) {
   fs.mkdirSync(nextDir)
 }
 
-const fileContents = `### ${heading}
-${description}  
+const [heading, description] = comment.split('\\n\\n')
+
+const fileContents = `### ${heading}\n${description || ''}
 
 [Pull Request](https://github.com/newrelic/newrelic-browser-agent/pull/${pr})
 
-${!!links && links.length ? links.join('\n\n') : ''}`
+${!!links && links.length ? links.join('\n\n') : ''}`.replace('\n\n\n', '\n\n')
 
 fs.writeFileSync(`${nextDir}/${formatFilename(heading)}.md`, fileContents, 'utf-8')
 
