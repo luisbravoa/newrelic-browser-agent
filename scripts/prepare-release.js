@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const core = require('@actions/core')
 const argv = require('yargs')
   .usage('$0 [options]')
 
@@ -25,8 +26,9 @@ ${fileContents.join('\n')}`
   if (!fs.existsSync(nextDir)) {
     fs.mkdirSync(nextDir)
   }
+
+  console.log('use releaseBody for release in another step...', releaseBody)
+  core.setOutput('releaseBody', releaseBody)
 }
 
 run()
-
-// fs.writeFileSync(`${nextDir}/${pr}.md`, fileContents, 'utf-8')

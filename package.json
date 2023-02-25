@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint -c .eslintrc.cjs --ext .js,.cjs,.mjs .",
+    "lint": "eslint -c .eslintrc.js --ext .js,.cjs,.mjs .",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"
   },
@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/newrelic/newrelic-browser-agent#readme",
   "devDependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
     "eslint": "^8.34.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
