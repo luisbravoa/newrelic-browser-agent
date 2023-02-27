@@ -9,27 +9,29 @@ const argv = require('yargs')
 
   .string('c')
   .alias('c', 'comment')
-  .describe('h', 'The PR comment, extended descriptions are used to fill the body of the changelog item if present')
-
-  .array('l')
-  .alias('l', 'links')
-  .describe('l', 'space delimited list of links to append at bottom of changelog item')
+  .describe('c', 'The PR comment, extended descriptions are used to fill the body of the changelog item if present')
+  .default('c', '')
 
   .argv
 
-const { pr, comment, links } = argv
+const { pr, comment } = argv
+if (!pr) {
+  console.log('Event ID (PR number) must be included')
+  process.exit(1)
+}
+
 const nextDir = path.join(__dirname, '../src/next')
 if (!fs.existsSync(nextDir)) {
   fs.mkdirSync(nextDir)
 }
 
-const [heading, description] = comment.split('\\n\\n')
+let [heading, ...description] = comment.split('\\n\\n')
+heading = heading || `PR-${pr}`
+description = description?.map(x => x.split('\\n')).flat().filter(x => x) || ['']
 
-const fileContents = `### ${heading}\n${description || ''}
+const fileContents = `### ${heading}\n${description.join('\n\n')}
 
-[Pull Request](https://github.com/newrelic/newrelic-browser-agent/pull/${pr})
-
-${!!links && links.length ? links.join('\n\n') : ''}`.replace('\n\n\n', '\n\n')
+[Pull Request](https://github.com/newrelic/newrelic-browser-agent/pull/${pr})`.replace('\n\n\n', '\n\n')
 
 fs.writeFileSync(`${nextDir}/${formatFilename(heading)}.md`, fileContents, 'utf-8')
 
