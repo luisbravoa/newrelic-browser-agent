@@ -1,0 +1,20 @@
+{
+  "name": "basic-import",
+  "version": "0.0.0",
+  "description": "A basic app that just imports the agent",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode=production --node-env=production"
+  },
+  "dependencies": {
+    "@newrelic/browser-agent": "file:../../../newrelic-browser-agent-0.0.9.tgz"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@webpack-cli/generators": "^3.0.1",
+    "babel-loader": "^9.1.2",
+    "webpack": "^5.76.1",
+    "webpack-cli": "^5.0.1"
+  }
+}
