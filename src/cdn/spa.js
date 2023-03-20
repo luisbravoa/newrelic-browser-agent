@@ -1,3 +1,7 @@
+/**
+ * @file Creates a "SPA" agent loader bundle composed of the core agent and all available feature modules.
+ */
+
 import './public-path'
 import { Agent } from '../loaders/agent'
 

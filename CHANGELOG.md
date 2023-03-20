@@ -3,53 +3,82 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## v1227
+
+### Added INP and long tasks reporting
+The interaction-to-next-paint metric is now calculated and reported at the end of user sessions, via the [Google CWV](https://github.com/GoogleChrome/web-vitals) library. In addition, long continuously executed and blocking scripts detected by the PerformanceLongTaskTiming API are also forwarded to New Relic. This latter functionality is `off` by default, until a curated UI experience is created to utilize this data.
+
+### Revert unwrapping of globals on agent abort
+Partial revert of graceful handling change made in v1225 that unwrapped modified global APIs and handlers, which caused integration issues with other wrapping libraries and code.
+
+### Add internal metrics to evaluate feasibility page resource harvests
+Internal metrics were added to track the feasibility and impact of collecting page resource information using the PerformanceObserver resource timings, such as scripts, images, network calls, and more. 
+
+### Add resiliency around SPA interaction saving
+Added resiliency code around SPA interaction node save functionality to ensure a cancelled interaction node without a parent further up the interaction tree does not cause an exception to be raised from the agent.
+
+### Collect supportability metrics at the end of page life
+Collate all of the internal statistic metrics calls, which--of today--are sent at page start and periodically, into one call made when the end user is leaving the page.
+
+## v1226
+
+### Revert xhr deny list timeslice metrics 
+Customers were losing visibility into all calls on the page when denying timeslice metrics based on the deny list.  This change reverts to the behaviour seen in all previous versions of the Browser Agent.
+
+### Enable back/forward cache
+Updating the agent default configuration to enable the back/forward cache feature previously released in version 1222 by default.
+
+### Handle unhandledPromiseRejections more gracefully
+The agent will attempt to handle niche objects throw from `unhandledPromiseRejection` events more gracefully. These cases could include objects with frozen or static properties, or custom extensions of the Error class without a `set` method in place.
+
+### Disable metrics for missing entitlement
+Fixing issue where metrics harvesting was not being halted when the agent RUM call indicated the account did not have entitlement to the jserrors endpoint. Before this change, customers missing this entitlement would see network calls to the New Relic jserrors endpoint result in 403 or 409 errors.
+
+### All agents must make a connect call for NR1 entity synthesis
+This change forces all agents to call ingest at runtime to ensure that entities can be synthesized in NR1.  This particularly pertains to any bespoke agent builds that did not utilize the `page_view_event` feature.
+
 ## v1225
 
 ### Gracefully abort agent if not fully instantiated
-When importing agent code fails, e.g. gets content blocked, the agent will clean up memory it used and the global space or APIs that it wrapped, modified, or dirtied as much as feasible.
+When importing of agent code fails, as when content gets blocked, the agent will clean up memory, the global scope, and any wrapped or modified APIs as much as feasible.
 
-### Re-done Promise wrapper
-We've seen some past problems with how Promise was wrapped, which conflicted with some third party libraries and also was missing newer methods from the native Promise API.
-This redone wrapping should resolve those problems and is a better, more conventional way to extend the Promise object.
-
-### Some clean up of deprecated code
-Some older IE-related code is removed, and so is a query param in our page view RUM call that's no longer being used.
+### Refactor wrapping of Promise object
+The agent's wrapping of the `Promise` object has been refactored to address conflicts with third party libraries and to add newer methods available on the native object. The new wrapping implementation is more conventional and less error-prone.
 
 ### Fix uncaught promise error introduced in v1223
-Related to failed imports, a "loading chunk 629" error was thrown despite the intention to just catch it as a warning. The cause was actually an uncaught promise in the code,
-which has now been fixed and the error silenced.
+In some cases of failure to import agent script chunk "629", an error was thrown rather than caught and logged as a warning. The uncaught promise error responsible for this unintended behavior has been fixed.
 
-### Resolving google indexing of agent relative paths
-In previous version, the agent script that was injected or copied/pasted into page HTML included relative paths to the agents lazy chunks. Google indexing picked these relative paths up and attempted to index them as pages. This change removes those relatives paths from the loader and centralizes our lazy chunk loading for agent features.
+### Resolve Google indexing of agent relative paths
+In previous versions, the agent script included relative paths to its lazy-loaded chunks, which Googlebot picked up and attempted to index as pages. This change removes those relatives paths from the loader and centralizes our lazy chunk loading of agent features.
 
 ## v1224
 
 ### Support SPA, XHR, and session trace features on Chrome for iOS
-Previously, the agent did not collect SPA browser interactions, XHR events, or session trace data in Chrome for iOS (which uses the webkit engine with modifications). The agent will now collect the same data in Chrome for iOS as in other supported browsers.
+Previously, the agent didn't collect SPA browser interactions, XHR events, or session trace data in Chrome for iOS, which uses the webkit engine with modifications. The agent now collects the same data in Chrome for iOS as in other supported browsers.
 
 ### Fix multiple custom interaction end times
-Fixed an issue where multiple custom interactions harvested at the same time would result in only one interaction being persisted in NR1.
+Fixed an issue where multiple custom interactions harvested at the same time would result in only one interaction being persisted in New Relic.
 
-### Prevent ajax time slice metrics based on deny list
-Prevent time slice metric collection for ajax calls when such a call matches an entry in the ajax deny list.
+### Prevent AJAX time slice metrics based on deny list
+Prevent time slice metric collection for AJAX calls when such a call matches an entry in the AJAX deny list.
 
 ### Bind navigator scope to sendBeacon
-Some browser versions will throw errors if sendBeacon does not have the navigator scope bound to it. A fail-safe action of binding the navigator scope to sendBeacon was added to try to support those browsers.
+Some browser versions will throw errors if sendBeacon doesn't have the navigator scope bound to it. A fail-safe action of binding the navigator scope to sendBeacon was added to try to support those browsers.
 
 ### Expose build version to newrelic global
-The build version will now be exposed to the newrelic global object. It can be accessed under `newrelic.intializedAgents[<agentID>].runtime.version`.
+The build version is exposed to the `newrelic` global object. You can access it with `newrelic.intializedAgents[<agentID>].runtime.version`.
 
-### Add automation for docs-site updates on new releases
-A new release of the Browser Agent will automatically raise a PR to the docs-site team with relevant changelog items.
+### Add automation for documentation site updates on new releases
+A new release of the browser agent will automatically raise a PR to the documentation site with the relevant changelog items.
 
 ### Preserve unhandledPromiseRejection reasons as human-readable strings in error payloads
-The agent will attempt to preserve unhandledPromiseRejection reasons as human-readable messages on the Error payload that gets harvested. The previous strategy did not always work, because Promise.reject can pass any value, not just strings.
+The agent will attempt to preserve `unhandledPromiseRejection` reasons as human-readable messages on the Error payload that gets harvested. The previous strategy didn't always work, because `Promise.reject` can pass any value, not just strings.
 
 ### Fix missing interactions for dynamic routes in Next/React
-Fixed an issue where when using the SPA loader with Next/React, route changes that lazy loaded components would not be captured. While the issue specifically called out Next/React, this should apply to Nuxt/Vue and Angular.
+Fixed an issue where when using the SPA loader with Next/React, route changes that lazy loaded components wouldn't be captured. While the issue specifically called out Next/React, this should apply to Nuxt/Vue and Angular.
 
 ### Fix interactions missing API calls in Angular
-Fixed an issue where when using the SPA loader with Angular, route changes that contained API calls, via Angular resolver, would not capture the xhr/fetch on the interaction. This works with eager and lazy routes in an Angular SPA.
+Fixed an issue where when using the SPA loader with Angular, route changes that contained API calls, via Angular resolver, wouldn't capture the xhr/fetch on the interaction. This works with eager and lazy routes in an Angular SPA.
 
 ## v1223
 

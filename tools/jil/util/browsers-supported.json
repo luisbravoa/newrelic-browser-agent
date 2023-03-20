@@ -4,59 +4,59 @@
       "browserName": "chrome",
       "platform": "Windows 11",
       "platformName": "Windows 11",
-      "version": "109",
-      "browserVersion": "109"
+      "version": "111",
+      "browserVersion": "111"
     },
     {
       "browserName": "chrome",
-      "platform": "Windows 11",
-      "platformName": "Windows 11",
-      "version": "106",
-      "browserVersion": "106"
+      "platform": "Windows 10",
+      "platformName": "Windows 10",
+      "version": "108",
+      "browserVersion": "108"
     },
     {
       "browserName": "chrome",
-      "platform": "Windows 11",
-      "platformName": "Windows 11",
-      "version": "103",
-      "browserVersion": "103"
+      "platform": "Windows 10",
+      "platformName": "Windows 10",
+      "version": "104",
+      "browserVersion": "104"
     },
     {
       "browserName": "chrome",
-      "platform": "Windows 11",
-      "platformName": "Windows 11",
-      "version": "100",
-      "browserVersion": "100"
+      "platform": "Windows 10",
+      "platformName": "Windows 10",
+      "version": "101",
+      "browserVersion": "101"
     }
   ],
   "edge": [
     {
       "browserName": "MicrosoftEdge",
-      "platform": "Windows 10",
-      "platformName": "Windows 10",
-      "version": "109",
-      "browserVersion": "109"
-    },
-    {
-      "browserName": "MicrosoftEdge",
-      "platform": "Windows 10",
-      "platformName": "Windows 10",
-      "version": "106",
-      "browserVersion": "106"
+      "platform": "Windows 11",
+      "platformName": "Windows 11",
+      "version": "111",
+      "browserVersion": "111"
     },
     {
       "browserName": "MicrosoftEdge",
       "platform": "Windows 11",
       "platformName": "Windows 11",
-      "version": "103",
-      "browserVersion": "103"
+      "version": "108",
+      "browserVersion": "108"
+    },
+    {
+      "browserName": "MicrosoftEdge",
+      "platform": "Windows 11",
+      "platformName": "Windows 11",
+      "version": "104",
+      "browserVersion": "104"
     },
     {
       "browserName": "MicrosoftEdge",
       "platform": "Windows 10",
       "platformName": "Windows 10",
-      "version": "100",
-      "browserVersion": "100"
+      "version": "101",
+      "browserVersion": "101"
     }
   ],
   "safari": [
@@ -77,22 +77,22 @@
     {
       "browserName": "firefox",
       "platform": "Windows 10",
-      "version": "109"
+      "version": "111"
     },
     {
       "browserName": "firefox",
       "platform": "Windows 10",
-      "version": "106"
+      "version": "108"
     },
     {
       "browserName": "firefox",
       "platform": "Windows 10",
-      "version": "103"
+      "version": "104"
     },
     {
       "browserName": "firefox",
       "platform": "Windows 10",
-      "version": "100"
+      "version": "101"
     }
   ],
   "android": [
@@ -106,7 +106,7 @@
       "appium:platformVersion": "9.0",
       "appium:automationName": "UiAutomator2",
       "sauce:options": {
-        "appiumVersion": "1.22.1"
+        "appiumVersion": "1.22.3"
       }
     }
   ],

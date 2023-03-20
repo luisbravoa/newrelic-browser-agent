@@ -7,11 +7,21 @@ module.exports = {
     'tests/assets/js/internal/**/*',
     'tests/assets/js/vendor/**/*',
     'tests/assets/modular/js-errors/js/vendor/**/*',
+    'tools/test-builds/**/*',
 
     // Remove the below ignores once lint errors are fixed
     'tools/scripts/publish-current.js',
     'tools/scripts/upload-to-s3.js'
   ],
+  parser: '@babel/eslint-parser',
+  parserOptions: {
+    requireConfigFile: false,
+    babelOptions: {
+      plugins: [
+        '@babel/plugin-syntax-import-assertions'
+      ]
+    }
+  },
   env: {
     es2022: true
   },
@@ -46,7 +56,7 @@ module.exports = {
       }
     },
     {
-      files: ['src/**/*.test.js'],
+      files: ['src/**/*.test.js', 'tests/specs/**/*.e2e.js'],
       env: {
         browser: true,
         node: true,
@@ -105,6 +115,7 @@ module.exports = {
     'no-mixed-operators': 'off',
     'no-tabs': 'off',
     'no-mixed-spaces-and-tabs': 'off',
-    'no-return-assign': 'off'
+    'no-return-assign': 'off',
+    'no-unreachable-loop': 'off'
   }
 }
